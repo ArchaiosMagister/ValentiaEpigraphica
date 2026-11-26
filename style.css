@@ -407,3 +407,28 @@ details summary { font-family: var(--catalogue-font); font-weight: 400; }
   background-image: radial-gradient(ellipse at 16% 12%, #ffffff0a, transparent 65%);
 }
 nav svg, .quiet svg { display: block; width: 23px; height: 23px; margin-inline: auto; }
+
+
+/* Small-screen and outdoor legibility refinements. */
+.brand { flex: 1; min-width: 0; }
+.brand > div, .list-title, .option span { min-width: 0; }
+.brand h1 { overflow-wrap: break-word; }
+.quiet { flex-shrink: 0; }
+.zone { grid-template-columns: minmax(0, 1fr) auto; }
+.zone button { min-width: 0; }
+.option span { overflow-wrap: break-word; font-size: 1.03rem; line-height: 1.45; }
+.stone-frame .epigraph { font-size: clamp(1rem, 3.8vw, 1.125rem); }
+.stone-frame .epigraph.enlarged { font-size: 1.4rem; }
+.epigraph { max-width: 100%; overscroll-behavior-inline: contain; }
+nav button { min-width: 0; min-height: 48px; }
+@media (max-width: 360px) {
+  .welcome-monument { padding: .8rem .6rem; }
+  .welcome-monument-inner { padding: .75rem .35rem; }
+  .welcome-emblem { width: 62px; height: 47px; }
+  .welcome-facts { margin-block: .7rem; }
+  .zone { grid-template-columns: 1fr; gap: .35rem; }
+}
+@media (forced-colors: active) {
+  .welcome-cenefa { display: none; }
+  .option:has(input:checked), nav button[aria-current=page] { outline: 2px solid Highlight; }
+}
