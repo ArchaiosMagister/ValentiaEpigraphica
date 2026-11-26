@@ -31,13 +31,13 @@ require('../data.js');
     for (const item of items) {
       await page.locator('.list-item[data-open="' + item.id + '"]').click();
       assert.equal(await page.locator('h2').textContent(), item.title);
-      assert.equal(await page.locator('fieldset').count(), 3);
-      assert.match(await page.locator('legend').last().textContent(), /¿Ante qué tipo de inscripción estamos\?/);
+      assert.equal(await page.locator('fieldset').count(), item.questions.length);
+      assert.match(await page.locator('legend').nth(2).textContent(), /¿Ante qué tipo de inscripción estamos\?/);
       const fields = page.locator('#latin-text pre');
       assert.deepEqual(await fields.allTextContents(), item.latin.split('\n\n'));
       assert.equal(await fields.first().evaluate(field => getComputedStyle(field).fontVariantCaps), 'small-caps');
       if (item.id === 4) {
-        assert.deepEqual(await page.locator('legend i[lang=la]').allTextContents(), ['deo', 'Asclepio']);
+        assert.deepEqual(await page.locator('legend i[lang=la]').allTextContents(), ['Asclepio deo']);
       }
       for (const [i, question] of item.questions.entries()) {
         assert.equal(question.options.length, 3);
@@ -45,11 +45,22 @@ require('../data.js');
         await page.locator('input[name=q' + i + '][value="' + question.correct + '"]').check();
       }
       await page.locator('#check').click();
-      assert.equal(await page.locator('.feedback.correct').count(), 3);
+      await page.waitForFunction(n => document.querySelectorAll('.feedback.correct:not([hidden])').length === n, item.questions.length);
+      assert.equal(await page.locator('.feedback.correct').count(), item.questions.length);
       await page.locator('nav [data-tab=list]').click();
     }
     await page.locator('nav [data-tab=results]').click();
-    assert.equal(await page.locator('.score').textContent(), '24/24');
+    assert.equal(await page.locator('.score').textContent(), '26/26');
+    await page.getByRole('button', {name:'Hacer recapitulación'}).click();
+    assert.equal(await page.locator('fieldset').count(), 5);
+    for (const [i,q] of globalThis.VE_DATA.recap.questions.entries()) {
+      await page.locator('input[name=q'+i+'][value="'+q.correct+'"]').check();
+    }
+    await page.locator('#check').click();
+    await page.waitForFunction(() => document.querySelectorAll('.feedback.correct:not([hidden])').length === 5);
+    await page.locator('nav [data-tab=results]').click();
+    assert.equal(await page.locator('#recap-score').textContent(),'5/5');
+    assert.equal(await page.locator('.score').textContent(),'26/26');
     await page.locator('main [data-open="1"]').click();
     await page.locator('input[name=q0][value="0"]').check();
     await page.getByText('Traducción', { exact: true }).click();
@@ -58,13 +69,16 @@ require('../data.js');
     await page.locator('#check').click();
     assert.equal(await page.locator('details[open]').count(), 2);
     assert.equal(await page.locator('#enlarge-latin').getAttribute('aria-pressed'), 'true');
+    await page.waitForFunction(() => document.querySelectorAll('.feedback.incorrect:not([hidden])').length === 1);
     assert.equal(await page.locator('.feedback.incorrect').count(), 1);
     await page.locator('.actions [data-open="2"]').click();
     await page.locator('.actions [data-open="1"]').click();
     assert.equal(await page.locator('.feedback.incorrect').count(), 1);
     await page.locator('#theme').click();
+    await page.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
     assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
     await page.locator('#theme').click();
+    await page.waitForFunction(() => document.documentElement.dataset.theme === 'oled');
     assert.equal(await page.locator('html').getAttribute('data-theme'), 'oled');
 
     await context.setOffline(true);
@@ -96,23 +110,30 @@ require('../data.js');
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'horizontal overflow at ' + width);
     }
     await page.locator('nav [data-tab=results]').click();
-    assert.equal(await page.locator('.score').textContent(), '23/24');
+    assert.equal(await page.locator('.score').textContent(), '25/26');
+    assert.equal(await page.locator('#recap-score').textContent(),'5/5');
+    await page.getByRole('button',{name:'Revisar recapitulación'}).click();
+    assert.equal(await page.locator('input:checked').count(),5);
+    await page.locator('nav [data-tab=results]').click();
     page.once('dialog', dialog => dialog.dismiss());
     await page.locator('#reset').click();
-    assert.equal(await page.locator('.score').textContent(), '23/24');
+    assert.equal(await page.locator('.score').textContent(), '25/26');
     page.once('dialog', dialog => dialog.accept());
     await page.locator('#reset').click();
+    await page.getByRole('button', { name: 'Empezar recorrido' }).waitFor();
     await page.reload();
     await page.getByRole('button', { name: 'Empezar recorrido' }).click();
     await page.locator('nav [data-tab=results]').click();
-    assert.equal(await page.locator('.score').textContent(), '0/24');
+    assert.equal(await page.locator('.score').textContent(), '0/26');
+    assert.equal(await page.locator('[data-go=recap]').count(),0);
+    assert.equal(await page.locator('#recap-score').count(),0);
     await page.evaluate(() => localStorage.setItem('valentia-epigraphica-v1', JSON.stringify({
       answers: { 1: { draft: [1, 0], graded: [1, 0] } },
       theme: 'light',
     })));
     await page.reload();
     await page.locator('nav [data-tab=results]').click();
-    assert.equal(await page.locator('.score').textContent(), '2/24');
+    assert.equal(await page.locator('.score').textContent(), '2/26');
     assert.equal(await page.locator('[role=progressbar]').getAttribute('aria-valuenow'), '0');
     await page.locator('main [data-open="1"]').click();
     assert.equal(await page.locator('input:checked').count(), 2);
@@ -120,7 +141,7 @@ require('../data.js');
     await page.getByText('Contexto histórico', { exact: true }).click();
     assert.ok((await page.locator('details i[lang=la]').allTextContents()).includes('nomen'));
     assert.deepEqual(errors, []);
-    console.log('Ocho fichas, 24 preguntas, GPS simulado, temas, cinco anchos, recarga sin red, puntuación y reinicio.');
+    console.log('Ocho fichas, 26 preguntas, GPS simulado, temas, cinco anchos, recarga sin red, puntuación y reinicio.');
   } finally {
     await browser.close();
   }

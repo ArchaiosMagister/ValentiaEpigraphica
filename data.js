@@ -39,6 +39,16 @@ globalThis.VE_DATA = {
           ],
           "correct": 0,
           "explanation": "Los dedicantes honran a Quinto Junio Crates y lo llaman amigo."
+        },
+        {
+          "text": "¿Qué pista del texto sugiere que los dos dedicantes de Crates tuvieron un antiguo propietario común?",
+          "options": [
+            "El mismo praenomen: Gayo",
+            "El mismo nomen: Riccius/Riccia",
+            "El mismo cognomen: Crates"
+          ],
+          "correct": 1,
+          "explanation": "Comparten el *nomen* *Riccius/Riccia*. Es un indicio de un posible patrono común, no una prueba concluyente."
         }
       ],
       "lat": 39.4732235,
@@ -194,14 +204,14 @@ globalThis.VE_DATA = {
       "context": "Asclepio, hijo de Apolo y educado por Quirón, tenía un célebre santuario en Epidauro. Según la tradición, Hipócrates descendía de Asclepio. El *cognomen* griego de Higino y su condición de séviro augustal son indicios de que era liberto.",
       "questions": [
         {
-          "text": "¿Qué función desempeña *deo* respecto a *Asclepio*?",
+          "text": "¿Qué función sintáctica desempeña el sintagma *Asclepio deo* en la inscripción?",
           "options": [
+            "Sujeto de la dedicatoria",
             "Complemento directo",
-            "Aposición",
-            "Complemento circunstancial"
+            "Complemento indirecto (destinatario)"
           ],
-          "correct": 1,
-          "explanation": "*Deo* está en dativo y precisa la identidad de *Asclepio*."
+          "correct": 2,
+          "explanation": "El sintagma completo *Asclepio deo* está en dativo e identifica al destinatario de la dedicatoria: «al dios Asclepio»."
         },
         {
           "text": "¿De qué era dios Asclepio?",
@@ -222,6 +232,16 @@ globalThis.VE_DATA = {
           ],
           "correct": 2,
           "explanation": "Es una ofrenda al dios Asclepio. El destinatario aparece en *Asclepio deo*."
+        },
+        {
+          "text": "Según la tradición mitológica, ¿quién fue el padre de Asclepio y quién lo educó?",
+          "options": [
+            "Zeus y Prometeo",
+            "Apolo y Quirón",
+            "Hermes y Sileno"
+          ],
+          "correct": 1,
+          "explanation": "Asclepio era hijo de Apolo y fue educado por el centauro Quirón."
         }
       ],
       "lat": 39.4762275,
@@ -535,5 +555,62 @@ globalThis.VE_DATA = {
       ],
       "frame": "tall"
     }
-  ]
+  ],
+  "recap": {
+    "id": "recap",
+    "roman": "Recapitulación",
+    "title": "Recapitulación final",
+    "questions": [
+      {
+        "text": "¿En qué casos aparecen habitualmente los dedicantes y los dedicatarios, respectivamente?",
+        "options": [
+          "Dativo y nominativo",
+          "Nominativo y dativo",
+          "Nominativo y genitivo"
+        ],
+        "correct": 1,
+        "explanation": "El dedicante aparece habitualmente en nominativo, como sujeto del verbo sobreentendido; el destinatario, en dativo."
+      },
+      {
+        "text": "¿Cómo desarrollarías la abreviatura *M.* en *M. Aquilio Aquilino* y en *M. Antonius Avitus*, respectivamente?",
+        "options": [
+          "Marcus y Marco",
+          "Marci y Marcus",
+          "Marco y Marcus"
+        ],
+        "correct": 2,
+        "explanation": "*Marco* está en dativo y *Marcus* en nominativo. El contexto permite determinar la flexión del nombre abreviado."
+      },
+      {
+        "text": "¿Cómo desarrollarías la abreviatura *F.* en *Antoniæ M. F. Lepidæ* y en *Antonia M. F. Lepida*, respectivamente?",
+        "options": [
+          "Filiæ y filia",
+          "Filia y filiæ",
+          "Filiæ y filius"
+        ],
+        "correct": 0,
+        "explanation": "La filiación concuerda en caso con el nombre femenino: *filiæ* en dativo en la inscripción VI y *filia* en nominativo en la V."
+      },
+      {
+        "text": "¿Qué particularidad gráfica presentan las palabras *VXORI* y *AVGVSTALIS* respecto a nuestra escritura habitual?",
+        "options": [
+          "La X representa una doble S",
+          "La V representa la vocal U",
+          "La I sustituye a la letra E"
+        ],
+        "correct": 1,
+        "explanation": "En la escritura monumental latina se emplea V tanto para la vocal U como para el sonido consonántico representado modernamente por V."
+      },
+      {
+        "text": "¿Qué diferencia hay entre los paréntesis de *LEG(ATVS)* y los corchetes de *[PI]ETATE*?",
+        "options": [
+          "Los paréntesis restituyen letras perdidas y los corchetes desarrollan abreviaturas",
+          "Ambos signos señalan letras borradas de manera intencionada",
+          "Los paréntesis desarrollan una abreviatura y los corchetes restituyen letras no conservadas"
+        ],
+        "correct": 2,
+        "explanation": "En esta edición, los paréntesis desarrollan una abreviatura y los corchetes cuadrados simples indican una restitución editorial de letras perdidas."
+      }
+    ]
+  }
 };

@@ -112,7 +112,6 @@ nav[hidden] { display: none; }
   white-space: normal;
   font-size: clamp(.95rem, 3.8vw, 1.125rem);
 }
-.stone-frame .epigraph.enlarged { font-size: 1.4rem; }
 .inscription-fields { display: flex; width: max-content; min-width: 100%; justify-content: center; }
 .inscription-fields pre {
   margin: 0;
@@ -401,7 +400,6 @@ details summary { font-family: var(--catalogue-font); font-weight: 400; }
 }
 .stone-frame--ara { border-block: 5px double var(--stone-edge); }
 .stone-frame--pedestal { border-block: 4px double var(--stone-edge); }
-.stone-frame--diptych pre + pre { border-inline-start: 3px double var(--stone-edge); }
 :is([data-theme=dark], [data-theme=oled]) .stone-frame .epigraph {
   text-shadow: 0 1px 0 #0008;
   background-image: radial-gradient(ellipse at 16% 12%, #ffffff0a, transparent 65%);

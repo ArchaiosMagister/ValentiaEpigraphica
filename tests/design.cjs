@@ -43,7 +43,9 @@ async function loadFonts(page) {
 async function theme(page, value) {
   for (let i = 0; i < 3; i++) {
     if (await page.locator('html').getAttribute('data-theme') === value) return;
+    const previous = await page.locator('html').getAttribute('data-theme');
     await page.locator('#theme').click();
+    await page.waitForFunction(previous => document.documentElement.dataset.theme !== previous, previous);
   }
   assert.equal(await page.locator('html').getAttribute('data-theme'), value);
 }
@@ -84,7 +86,7 @@ async function theme(page, value) {
       }
       await page.locator('nav [data-tab=results]').click();
       await layout(page, 'results ' + value);
-      assert.equal(await page.locator('.score').textContent(), '0/24');
+      assert.equal(await page.locator('.score').textContent(), '0/26');
     }
     // WebKit's offline emulation may fail before dispatching navigation to
     // the service worker. In CI, stop the real HTTP origin instead.

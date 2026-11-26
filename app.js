@@ -1,26 +1,177 @@
 'use strict';
-const {items}=VE_DATA;const main=document.querySelector('#main'),key='valentia-epigraphica-v1';let storageOK=true;function load(){try{return JSON.parse(localStorage.getItem(key)||'{}')||{}}catch{storageOK=false;return {}}}let saved=load(),answers=normalizeAnswers(saved.answers),theme=saved.theme||((matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light'),started=saved.started===true||Object.keys(answers).length>0,tab=started?'route':'welcome',selected=null,position=null,watch=null,gpsMessage='Activa la ubicación para ver la distancia aproximada.';document.documentElement.dataset.theme=theme;
+const { items, recap } = VE_DATA;
+const activities = [...items, recap];
+const main = document.querySelector('#main');
+const key = 'valentia-epigraphica-v1';
+const themes = ['light', 'dark', 'oled'];
+const defaultTheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+let storageOK = true;
+
 function normalizeAnswers(raw) {
   const valid = {};
-  for (const x of items) {
+  for (const x of activities) {
     const entry = raw?.[x.id];
-    if (!entry) continue;
-    valid[x.id] = {};
+    if (!entry || typeof entry !== 'object') continue;
+    const record = {};
+    // A text snapshot prevents an old index from silently selecting a
+    // different option if the question bank is reordered or edited.
+    const snapshot = Array.isArray(entry.questions) ? entry.questions : null;
     for (const field of ['draft', 'graded']) {
-      if (Array.isArray(entry[field])) {
-        valid[x.id][field] = x.questions.map((q, i) => {
-          const value = entry[field][i];
-          return Number.isInteger(value) && value >= 0 && value < q.options.length ? value : null;
-        });
-      }
+      if (!Array.isArray(entry[field])) continue;
+      record[field] = x.questions.map((q, i) => {
+        // The original Asclepius question (IV.1) was replaced. Legacy
+        // index-only progress must not grade the new question with its old answer.
+        if (!snapshot && x.id === 4 && i === 0) return null;
+        const oldIndex = snapshot ? snapshot.findIndex(old => old?.text === q.text) : i;
+        if (oldIndex < 0) return null;
+        const value = entry[field][oldIndex];
+        if (!Number.isInteger(value) || value < 0) return null;
+        if (!snapshot) return value < q.options.length ? value : null;
+        const oldOptions = snapshot[oldIndex]?.options;
+        if (!Array.isArray(oldOptions) || typeof oldOptions[value] !== 'string') return null;
+        const matches = q.options.map((option, j) => option === oldOptions[value] ? j : -1).filter(j => j >= 0);
+        return matches.length === 1 ? matches[0] : null;
+      });
     }
+    if (!record.draft && !record.graded) continue;
+    record.questions = x.questions.map(q => ({ text: q.text, options: q.options.slice() }));
+    valid[x.id] = record;
   }
   return valid;
 }
-function save(){try{localStorage.setItem(key,JSON.stringify({answers,theme,started}));storageOK=true}catch{storageOK=false}
-  const status = document.querySelector('#storage-status');
-  status.textContent = storageOK ? '' : 'El progreso solo se conserva mientras esta página permanezca abierta.';
+
+function normalizedState(raw) {
+  raw = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  const answers = normalizeAnswers(raw.answers);
+  return {
+    answers,
+    theme: themes.includes(raw.theme) ? raw.theme : defaultTheme,
+    started: raw.started === true || Object.keys(answers).length > 0,
+    generation: typeof raw.generation === 'string' ? raw.generation : 'legacy',
+  };
 }
+
+function readState() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(key) || '{}');
+    return normalizedState(raw);
+  } catch {
+    storageOK = false;
+    return null;
+  }
+}
+
+let state = readState() || normalizedState({});
+let { answers, theme, started } = state;
+let tab = started ? 'route' : 'welcome';
+let selected = null, position = null, watch = null, gpsGeneration = 0;
+let gpsMessage = 'Activa la ubicación para ver la distancia aproximada.';
+let syncDetail = null, pendingWrites = 0, writeQueue = Promise.resolve();
+let memoryOnly = !storageOK;
+
+function updateTheme() {
+  document.documentElement.dataset.theme = theme;
+  const button = document.querySelector('#theme');
+  const name = { light: 'claro', dark: 'oscuro', oled: 'OLED' }[theme];
+  button.setAttribute('aria-label', 'Cambiar tema (actual: ' + name + ')');
+  button.title = 'Tema ' + name;
+}
+updateTheme();
+
+function storageStatus() {
+  document.querySelector('#storage-status').textContent = storageOK
+    ? '' : 'No se puede garantizar el guardado. El progreso se conserva mientras esta página permanezca abierta.';
+}
+function recapUnlocked(records = answers) {
+  return items.every(x => x.questions.every((q, i) => Number.isInteger(records[x.id]?.graded?.[i])));
+}
+function adopt(next) {
+  const reset = next.generation !== state.generation;
+  state = next;
+  ({ answers, theme, started } = state);
+  updateTheme();
+  if (reset) {
+    stopGPS();
+    tab = 'welcome';
+    selected = null;
+  } else if (tab === 'recap' && !recapUnlocked()) {
+    tab = 'results';
+  } else if (started && tab === 'welcome') {
+    tab = 'route';
+  }
+  return reset;
+}
+function syncView(reset = false) {
+  if (pendingWrites) return;
+  if (!reset && (tab === 'detail' || tab === 'recap') && syncDetail) syncDetail();
+  else render();
+  storageStatus();
+}
+
+// Serialize writes across tabs when Web Locks is available. Older browsers
+// still merge the latest stored state for each individual mutation.
+function persist(kind, change) {
+  const generation = state.generation;
+  pendingWrites++;
+  const operation = async () => {
+    let reset = false;
+    const commit = () => {
+      const latest = memoryOnly ? state : (readState() || state);
+      const next = normalizedState(latest);
+      if (kind === 'reset' || kind === 'theme' || generation === next.generation) {
+        change(next);
+        try {
+          localStorage.setItem(key, JSON.stringify(next));
+          storageOK = true;
+          memoryOnly = false;
+        } catch {
+          storageOK = false;
+          memoryOnly = true;
+        }
+      }
+      reset = adopt(next);
+    };
+    // A lock serializes the synchronous read/modify/write. If unsupported
+    // or denied, the same narrow merge remains the compatibility fallback.
+    if (navigator.locks?.request && !memoryOnly) {
+      let entered = false;
+      try {
+        await navigator.locks.request(key, () => { entered = true; commit(); });
+      } catch (error) {
+        if (entered) throw error;
+        commit();
+      }
+    } else commit();
+    return reset;
+  };
+  const result = writeQueue.then(operation);
+  writeQueue = result.catch(() => {});
+  return result.then(reset => {
+    pendingWrites--;
+    syncView(reset);
+    return reset;
+  }, () => {
+    pendingWrites--;
+    storageOK = false;
+    storageStatus();
+    return false;
+  });
+}
+function answerRecord(next, x) {
+  return next.answers[x.id] ||= {
+    questions: x.questions.map(q => ({ text: q.text, options: q.options.slice() })),
+  };
+}
+window.addEventListener('storage', event => {
+  if (event.key !== key && event.key !== null) return;
+  if (pendingWrites || memoryOnly) return;
+  const next = readState();
+  if (next) {
+    storageOK = true;
+    syncView(adopt(next));
+  } else storageStatus();
+});
+
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const item=id=>items.find(x=>x.id===id);const complete=x=>Array.isArray(answers[x.id]?.graded)&&x.questions.every((q,i)=>Number.isInteger(answers[x.id].graded[i]));const count=()=>items.filter(complete).length;const points=x=>x.questions.filter((q,i)=>q.correct===answers[x.id]?.graded?.[i]).length;const score=()=>items.reduce((sum,x)=>sum+points(x),0);const totalQuestions=items.reduce((sum,x)=>sum+x.questions.length,0);const zones=[1,2,3,4].map(id=>item(id));
 function hav(a,b,c,d){const r=Math.PI/180,h=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 6371000*2*Math.asin(Math.sqrt(Math.min(1,h)))}
 function proximity(x) {
@@ -28,15 +179,16 @@ function proximity(x) {
   const zone = zones[x.zone - 1];
   const distance = hav(position.latitude, position.longitude, zone.lat, zone.lon);
   const accuracy = position.accuracy;
-  const approx = Math.max(10, Math.round(distance / 10) * 10);
+  const approx = Math.round(distance / 10) * 10;
   if (accuracy > 60) return 'Señal poco precisa';
   const band = d => d < 25 ? 'En las inmediaciones' : d < 60 ? 'Muy cerca' : d <= 120 ? 'Acercándose' : 'Lejos';
   const lower = band(Math.max(0, distance - accuracy));
   const upper = band(distance + accuracy);
   const label = lower === upper ? lower : 'Proximidad incierta';
-  return `≈ ${approx} m · ${label}`;
+  const estimate = distance + accuracy < 10 ? 'A menos de 10 m' : approx === 0 ? 'En torno a la referencia' : `≈ ${approx} m`;
+  return `${estimate} · ${label}`;
 }
-function gpsPanel(){return `<div class="gps-controls"><div class="row"><h3>Ubicación</h3><button id="gps" ${watch!==null?'aria-pressed="true"':''}>${watch!==null?'Desactivar GPS':'Activar GPS'}</button></div><p id="gps-status" class="muted" role="status">${esc(gpsMessage)}</p><p class="muted" style="margin:0">Solo se usa en este dispositivo; no se guarda ni se envía. No es necesario para responder.</p></div>`}
+function gpsPanel(){return `<div class="gps-controls"><div class="row"><h3>Ubicación</h3><button id="gps" aria-pressed="${watch !== null}">${watch!==null?'Desactivar GPS':'Activar GPS'}</button></div><p id="gps-status" class="muted" role="status">${esc(gpsMessage)}</p><p class="muted" style="margin:0">Solo se usa en este dispositivo; no se guarda ni se envía. No es necesario para responder.</p></div>`}
 const bounds = { north: 39.4770, south: 39.4725, west: -0.3761, east: -0.3719 };
 const scale = 350 / (bounds.north - bounds.south);
 const mapWidth = (bounds.east - bounds.west) * Math.cos(39.47 * Math.PI / 180) * scale;
@@ -85,7 +237,7 @@ function renderWelcome() {
     <div class="welcome-cenefa" aria-hidden="true"></div>
     <div class="welcome-body">
       <h2>Ocho inscripciones romanas</h2>
-      <p>Recorre el centro de Valencia, lee cada inscripción en su lugar y responde tres preguntas breves.</p>
+      <p>Recorre el centro de Valencia, lee cada inscripción en su lugar y responde tres o cuatro preguntas breves. Al terminar las ocho fichas, podrás realizar una recapitulación final.</p>
       <div class="welcome-facts"><div><strong aria-hidden="true">VIII</strong><span>8 inscripciones</span></div><div><strong aria-hidden="true">IV</strong><span>4 localizaciones</span></div></div>
       <button class="primary wide" data-go="route">Empezar recorrido</button>
       ${inscriptionTypes(true)}
@@ -99,7 +251,7 @@ function renderRoute() {
     <div class="card">${progress()}
       ${next ? `<p class="next-stop"><strong>${next.roman} · ${esc(next.street)}</strong><br>${esc(next.title)}</p>
         <button class="primary wide" data-open="${next.id}">${next.id === 1 ? 'Abrir primera inscripción' : 'Abrir siguiente inscripción'}</button>`
-      : '<p>Recorrido completado.</p><button class="primary wide" data-go="results">Ver resultados</button>'}
+      : '<p>Ocho inscripciones completadas.</p>' + (complete(recap) ? '<button class="primary wide" data-go="results">Ver resultados</button>' : '<button class="primary wide" data-go="recap">Recapitulación final</button>')}
     </div>
     <div class="card">
       ${inscriptionTypes()}
@@ -122,7 +274,7 @@ function transcription(item) {
   const fields = item.latin.split('\n\n');
   return `<div class="transcription">
     <div class="stone-frame stone-frame--${esc(item.frame)}">
-      <div id="latin-text" class="epigraph" lang="la" tabindex="0" role="region" aria-label="Transcripción latina">
+      <div id="latin-text" class="epigraph" lang="la" tabindex="0" role="region" aria-label="Transcripción latina (desplazable si el texto no cabe)">
         <div class="inscription-fields">${fields.map(field => `<pre>${esc(field)}</pre>`).join('')}</div>
       </div>
     </div>
@@ -130,7 +282,34 @@ function transcription(item) {
   </div>`;
 }
 
-function renderDetail(){const x=item(selected);const {closeup,setting}=inscriptionPhotos(x);const a=answers[x.id]||{},draft=a.draft||[],graded=complete(x)&&x.questions.every((q,i)=>draft[i]===a.graded[i]);main.innerHTML=`<button class="back" data-go="list">‹ Todas las inscripciones</button><p class="muted" id="completion-status">${x.roman} · ${complete(x) ? "Actividad completada" : "Actividad pendiente"}</p><h2>${esc(x.title)}</h2><p class="muted">${esc(x.street)} · ${esc(x.date)}</p><div class="card"><div class="row"><strong data-distance="${x.id}">${proximity(x)}</strong><button id="gps">${watch!==null?'Desactivar GPS':'Activar GPS'}</button></div><p id="gps-status" class="muted" role="status">${esc(gpsMessage)}</p><p class="muted">${esc(x.locationHint)}</p><p><a href="${esc(x.streetView)}" target="_blank" rel="noopener noreferrer">Ver la fachada en Street View</a></p><div class="inscription-display inscription-display--${esc(x.frame)}">${closeup}${transcription(x)}</div><details class="inscription-translation"><summary>Traducción</summary><p>${esc(x.translation)}</p></details><details><summary>Contexto histórico</summary><p>${formatLatinTerms(x.context)}</p></details>${setting}</div><form class="card" id="quiz"><h3>Actividades</h3>${x.questions.map((q,i)=>`<fieldset class="question"><legend>${i+1}. ${formatLatinTerms(q.text)}</legend>${q.options.map((o,j)=>`<label class="option"><input type="radio" name="q${i}" value="${j}" ${draft[i]===j?'checked':''}><span>${esc(o)}</span></label>`).join('')}<p class="feedback" hidden></p></fieldset>`).join('')}<button class="primary wide" id="check" type="submit" ${x.questions.every((q,i)=>Number.isInteger(draft[i]))?'':'disabled'}>Comprobar respuestas</button><p class="done quiz-result" role="status"></p></form><div class="actions">${x.id>1?`<button data-open="${x.id-1}">‹ Anterior</button>`:''}${x.id<8?`<button class="next-inscription" data-open="${x.id+1}">Siguiente inscripción · ${item(x.id+1).roman}</button>`:`<button data-go="results">Ver resultados ›</button>`}</div>`;const form = document.querySelector('#quiz');
+function quizMarkup(x) {
+  const draft = answers[x.id]?.draft || [];
+  return `<form class="card" id="quiz"><h3>${x.id === recap.id ? "Preguntas de recapitulación" : "Actividades"}</h3>${x.questions.map((q,i)=>`<fieldset class="question"><legend>${i+1}. ${formatLatinTerms(q.text)}</legend>${q.options.map((o,j)=>`<label class="option"><input type="radio" name="q${i}" value="${j}" ${draft[i]===j?'checked':''}><span>${esc(o)}</span></label>`).join('')}<p class="feedback" hidden></p></fieldset>`).join('')}<button class="primary wide" id="check" type="submit" ${x.questions.every((q,i)=>Number.isInteger(draft[i]))?'':'disabled'}>Comprobar respuestas</button><p class="done quiz-result" role="status"></p></form>`;
+}
+function renderDetail(){const x=item(selected);const {closeup,setting}=inscriptionPhotos(x);main.innerHTML=`<button class="back" data-go="list">‹ Todas las inscripciones</button><p class="muted" id="completion-status">${x.roman} · ${complete(x) ? "Actividad completada" : "Actividad pendiente"}</p><h2>${esc(x.title)}</h2><p class="muted">${esc(x.street)} · ${esc(x.date)}</p><div class="card"><div class="row"><strong data-distance="${x.id}">${proximity(x)}</strong><button id="gps" aria-pressed="${watch !== null}">${watch!==null?'Desactivar GPS':'Activar GPS'}</button></div><p id="gps-status" class="muted" role="status">${esc(gpsMessage)}</p><p class="muted">${esc(x.locationHint)}</p><p><a href="${esc(x.streetView)}" target="_blank" rel="noopener noreferrer">Ver la fachada en Street View</a></p><div class="inscription-display inscription-display--${esc(x.frame)}">${closeup}${transcription(x)}</div><details class="inscription-translation"><summary>Traducción</summary><p>${esc(x.translation)}</p></details><details><summary>Contexto histórico</summary><p>${formatLatinTerms(x.context)}</p></details>${setting}</div>${quizMarkup(x)}<div class="actions">${x.id>1?`<button data-open="${x.id-1}">‹ Anterior</button>`:''}${x.id<8?`<button class="next-inscription" data-open="${x.id+1}">Siguiente inscripción · ${item(x.id+1).roman}</button>`:`<button data-go="results">Ver resultados ›</button>`}</div>`;
+  attachQuiz(x);
+  const enlarge = document.querySelector('#enlarge-latin');
+  const latin = document.querySelector('#latin-text');
+  enlarge.addEventListener('click', () => {
+    const enlarged = latin.classList.toggle('enlarged');
+    enlarge.setAttribute('aria-pressed', String(enlarged));
+    enlarge.textContent = enlarged ? 'Reducir texto latino' : 'Ampliar texto latino';
+  });
+}
+function renderRecap() {
+  if (!recapUnlocked()) { tab = 'results'; render(); return; }
+  main.innerHTML = `<button class="back" data-go="results">‹ Resultados</button>
+    <h2>Recapitulación final</h2>
+    <p class="muted" id="completion-status">Recapitulación · ${complete(recap) ? 'Actividad completada' : 'Actividad pendiente'}</p>
+    <p>Repasa lo aprendido en las ocho inscripciones. Cinco preguntas sobre morfología, sintaxis y lectura epigráfica.</p>
+    ${quizMarkup(recap)}
+    <div class="actions"><button data-go="results">Ver resultados ›</button></div>`;
+  attachQuiz(recap);
+}
+function attachQuiz(x) {
+  const a = answers[x.id] || {}, draft = a.draft || [];
+  const graded = complete(x) && x.questions.every((q,i) => draft[i] === a.graded[i]);
+  const form = document.querySelector('#quiz');
   const feedback = [...form.querySelectorAll('.feedback')];
   const result = form.querySelector('.quiz-result');
   const check = form.querySelector('#check');
@@ -152,54 +331,233 @@ function renderDetail(){const x=item(selected);const {closeup,setting}=inscripti
     nextButton?.classList.toggle('primary', Boolean(gradedAnswers));
   }
 
+  function visibleAnswers() {
+    return x.questions.map((q, i) => {
+      const input = form.querySelector('input[name=q' + i + ']:checked');
+      return input ? Number(input.value) : null;
+    });
+  }
+  let renderedDraft = x.questions.map((q, i) => draft[i] ?? null);
+  let renderedRecord = JSON.stringify(a);
+  syncDetail = () => {
+    const current = answers[x.id] || {};
+    const fingerprint = JSON.stringify(current);
+    if (fingerprint === renderedRecord) return;
+    renderedRecord = fingerprint;
+    const values = x.questions.map((q, i) => current.draft?.[i] ?? null);
+    const visible = visibleAnswers();
+    // Only synchronize a group whose stored value actually changed.
+    // A native radio activation can precede its change event, particularly
+    // when a different tab is also committing progress. Never overwrite
+    // an in-flight local choice with a previous persisted snapshot.
+    for (const [i, value] of values.entries()) {
+      if (value === renderedDraft[i] || value === visible[i] || visible[i] !== renderedDraft[i]) continue;
+      const inputs = form.querySelectorAll('input[name=q' + i + ']');
+      if (value === null) inputs.forEach(input => { input.checked = false; });
+      else {
+        const input = [...inputs].find(input => Number(input.value) === value);
+        if (input) input.checked = true;
+      }
+    }
+    renderedDraft = values;
+    const displayed = visibleAnswers();
+    check.disabled = !displayed.every(Number.isInteger);
+    document.querySelector('#completion-status').textContent = x.roman + ' · ' +
+      (complete(x) ? 'Actividad completada' : 'Actividad pendiente');
+    showFeedback(complete(x) && displayed.every((value, i) => value === current.graded[i])
+      ? current.graded : null);
+  };
   showFeedback(graded ? draft : null);
   form.addEventListener('change', event => {
     const i = Number(event.target.name.slice(1));
-    const current = answers[x.id] ||= { draft: [] };
-    current.draft ||= [];
-    current.draft[i] = Number(event.target.value);
-    save();
+    const value = Number(event.target.value);
+    if (!x.questions[i] || !Number.isInteger(value) || value < 0 || value >= x.questions[i].options.length) return;
+    check.disabled = !visibleAnswers().every(Number.isInteger);
     showFeedback(null);
-    check.disabled = !x.questions.every((q, j) => Number.isInteger(current.draft[j]));
+    void persist('answer', next => {
+      if (x.id === recap.id && !recapUnlocked(next.answers)) return;
+      const record = answerRecord(next, x);
+      (record.draft ||= Array(x.questions.length).fill(null))[i] = value;
+      next.started = true;
+    });
   });
-
   form.addEventListener('submit', event => {
     event.preventDefault();
-    const current = answers[x.id];
-    if (!current || !x.questions.every((q, i) => Number.isInteger(current.draft[i]))) return;
-    current.graded = current.draft.slice();
-    save();
-    document.querySelector('#completion-status').textContent = x.roman + ' · Actividad completada';
-    showFeedback(current.graded);
+    const values = visibleAnswers();
+    if (!values.every((value, i) => Number.isInteger(value) && value >= 0 && value < x.questions[i].options.length)) return;
+    // Grade precisely the choices the pupil saw on submitting.
+    void persist('answer', next => {
+      if (x.id === recap.id && !recapUnlocked(next.answers)) return;
+      const record = answerRecord(next, x);
+      record.draft = values.slice();
+      record.graded = values.slice();
+      next.started = true;
+    });
   });
 
-  const enlarge = document.querySelector('#enlarge-latin');
-  const latin = document.querySelector('#latin-text');
-  enlarge.addEventListener('click', () => {
-    const enlarged = latin.classList.toggle('enlarged');
-    enlarge.setAttribute('aria-pressed', String(enlarged));
-    enlarge.textContent = enlarged ? 'Reducir texto latino' : 'Ampliar texto latino';
-  });
 }
-function renderResults(){main.innerHTML=`<h2>Resultados</h2><div class="card">${progress()}<p class="muted">Puntuación (últimas respuestas comprobadas)</p><div class="score">${score()}/${totalQuestions}</div><p>${count()===8?'Recorrido completado.':'Puedes continuar en cualquier momento.'}</p></div><div class="card">${items.map(x=>`<div class="zone"><button data-open="${x.id}">${x.roman}. ${esc(x.title)}</button><strong>${answers[x.id]?.graded?.some(Number.isInteger)?points(x)+'/'+x.questions.length:'—'}</strong></div>`).join('')}</div><div class="card"><h3>Reiniciar la actividad</h3><p class="muted">Borra las respuestas de este dispositivo para repetir la actividad.</p><button class="wide" id="reset">Reiniciar actividad</button></div>`}
-function render(){document.querySelector("nav").hidden=tab==="welcome";document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===(tab==='detail'?'list':tab)?'page':'false'));({welcome:renderWelcome,route:renderRoute,list:renderList,detail:renderDetail,results:renderResults}[tab])();if(!storageOK)document.querySelector('#storage-status').textContent='No se pudo acceder al progreso guardado en este dispositivo.'}
-function go(t,id){if(tab==='welcome'&&t!=='welcome'){started=true;save()}if(t==='results'&&watch!==null)stopGPS();tab=t;selected=id||null;render();scrollTo(0,0);main.focus({preventScroll:true})}
-function refreshGPS(){const s=document.querySelector('#gps-status');if(s)s.textContent=gpsMessage;document.querySelectorAll('[data-distance]').forEach(e=>e.textContent=proximity(item(Number(e.dataset.distance))));const m=document.querySelector('#map');if(m)m.innerHTML=map();const b=document.querySelector('#gps');if(b){b.textContent=watch===null?'Activar GPS':'Desactivar GPS';b.setAttribute('aria-pressed',String(watch!==null))}}
-function stopGPS(){if(watch!==null)navigator.geolocation.clearWatch(watch);watch=null;position=null;gpsMessage='Ubicación desactivada. Puedes seguir con las actividades.';refreshGPS()}
-function startGPS(){if(watch!==null){stopGPS();return}if(!navigator.geolocation||!isSecureContext){gpsMessage='Ubicación no disponible. Abre la web mediante HTTPS o localhost.';refreshGPS();return}gpsMessage='Buscando tu ubicación…';watch=navigator.geolocation.watchPosition(p=>{position=p.coords;gpsMessage=`Precisión estimada: ±${Math.round(position.accuracy)} m.${position.accuracy>35?' Señal poco precisa; usa las referencias de la calle.':''}`;refreshGPS()},e=>{position=null;gpsMessage=e.code===1?'Permiso denegado. Puedes continuar sin GPS.':'No se ha obtenido ubicación fiable. Puedes continuar sin GPS.';if(e.code===1&&watch!==null){navigator.geolocation.clearWatch(watch);watch=null}refreshGPS()},{enableHighAccuracy:false,maximumAge:5000,timeout:15000});refreshGPS()}
-document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.tab)go(b.dataset.tab);else if(b.dataset.go)go(b.dataset.go);else if(b.dataset.open)go('detail',Number(b.dataset.open));else if(b.id==='gps')startGPS();else if(b.id==='reset'&&confirm('¿Borrar todas las respuestas de esta actividad?')){answers={};started=false;save();stopGPS();go('welcome')}else if(b.id==='theme'){theme=({light:'dark',dark:'oled',oled:'light'})[theme]||'light';document.documentElement.dataset.theme=theme;save()}});document.addEventListener('visibilitychange',()=>{if(document.hidden&&watch!==null)stopGPS()});render();
+function recapCard() {
+  const unlocked = recapUnlocked();
+  return `<div class="card" id="recap-card"><h3>Recapitulación final</h3>
+    ${unlocked ? `<p>${complete(recap) ? 'Recapitulación completada.' : 'Cinco preguntas filológicas para terminar la actividad.'}</p>
+      <p class="muted">Puntuación de recapitulación: <strong id="recap-score">${points(recap)}/${recap.questions.length}</strong></p>
+      <button class="primary wide" data-go="recap">${complete(recap) ? 'Revisar recapitulación' : 'Hacer recapitulación'}</button>`
+      : '<p class="muted">Se desbloquea al completar las ocho inscripciones.</p>'}</div>`;
+}
+function renderResults(){main.innerHTML=`<h2>Resultados</h2><div class="card">${progress()}<p class="muted">Puntuación (últimas respuestas comprobadas)</p><div class="score">${score()}/${totalQuestions}</div><p>${count()===8?'Ocho inscripciones completadas.':'Puedes continuar en cualquier momento.'}</p></div>${recapCard()}<div class="card">${items.map(x=>`<div class="zone"><button data-open="${x.id}">${x.roman}. ${esc(x.title)}</button><strong>${answers[x.id]?.graded?.some(Number.isInteger)?points(x)+'/'+x.questions.length:'—'}</strong></div>`).join('')}</div><div class="card"><h3>Reiniciar la actividad</h3><p class="muted">Borra las respuestas de este dispositivo para repetir la actividad.</p><button class="wide" id="reset">Reiniciar actividad</button></div>`}
+function render(){syncDetail=null;document.querySelector("nav").hidden=tab==="welcome";document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===(tab==='detail'?'list':tab==='recap'?'results':tab)?'page':'false'));({welcome:renderWelcome,route:renderRoute,list:renderList,detail:renderDetail,recap:renderRecap,results:renderResults}[tab])();if(!storageOK)document.querySelector('#storage-status').textContent='No se pudo acceder al progreso guardado en este dispositivo.'}
+async function go(t, id) {
+  if (t === 'recap' && !recapUnlocked()) return;
+  if (tab === 'welcome' && t !== 'welcome') {
+    if (await persist('start', next => { next.started = true; })) return;
+  }
+  if (t !== 'route' && t !== 'detail' && watch !== null) stopGPS();
+  tab = t;
+  selected = id || null;
+  render();
+  scrollTo(0, 0);
+  main.focus({ preventScroll: true });
+}
+
+function refreshGPS() {
+  const status = document.querySelector('#gps-status');
+  if (status) status.textContent = gpsMessage;
+  document.querySelectorAll('[data-distance]').forEach(el => {
+    el.textContent = proximity(item(Number(el.dataset.distance)));
+  });
+  const mapNode = document.querySelector('#map');
+  if (mapNode) mapNode.innerHTML = map();
+  const button = document.querySelector('#gps');
+  if (button) {
+    button.textContent = watch === null ? 'Activar GPS' : 'Desactivar GPS';
+    button.setAttribute('aria-pressed', String(watch !== null));
+  }
+}
+function stopGPS(message = 'Ubicación desactivada. Puedes seguir con las actividades.') {
+  gpsGeneration++;
+  if (watch !== null) navigator.geolocation.clearWatch(watch);
+  watch = null;
+  position = null;
+  gpsMessage = message;
+  refreshGPS();
+}
+function beginWatch(highAccuracy) {
+  const generation = ++gpsGeneration;
+  if (watch !== null) navigator.geolocation.clearWatch(watch);
+  watch = null;
+  try {
+    watch = navigator.geolocation.watchPosition(p => {
+      if (generation !== gpsGeneration) return;
+      const coords = p.coords;
+      if (![coords.latitude, coords.longitude, coords.accuracy].every(Number.isFinite) || coords.accuracy < 0) {
+        stopGPS('No se ha obtenido ubicación fiable. Puedes volver a activar el GPS.');
+        return;
+      }
+      position = coords;
+      gpsMessage = `Precisión estimada: ±${Math.round(coords.accuracy)} m.` +
+        (coords.accuracy > 35 ? ' Señal poco precisa; usa las referencias de la calle.' : '');
+      if (!highAccuracy && coords.accuracy > 35) beginWatch(true);
+      refreshGPS();
+    }, error => {
+      if (generation !== gpsGeneration) return;
+      if (error.code !== 1 && !highAccuracy) {
+        gpsMessage = 'Buscando una ubicación más precisa…';
+        beginWatch(true);
+        return;
+      }
+      stopGPS(error.code === 1 ? 'Permiso denegado. Puedes continuar sin GPS.'
+        : 'No se ha obtenido ubicación fiable. Puedes volver a activar el GPS.');
+    }, { enableHighAccuracy: highAccuracy, maximumAge: 5000, timeout: 15000 });
+  } catch {
+    stopGPS('Ubicación no disponible. Puedes continuar sin GPS.');
+  }
+  refreshGPS();
+}
+function startGPS() {
+  if (watch !== null) { stopGPS(); return; }
+  if (!navigator.geolocation || !isSecureContext) {
+    gpsMessage = 'Ubicación no disponible. Abre la web mediante HTTPS o localhost.';
+    refreshGPS();
+    return;
+  }
+  gpsMessage = 'Buscando tu ubicación…';
+  beginWatch(false);
+}
+document.addEventListener('click', event => {
+  const b = event.target.closest('button');
+  if (!b) return;
+  if (b.dataset.tab) void go(b.dataset.tab);
+  else if (b.dataset.go) void go(b.dataset.go);
+  else if (b.dataset.open) void go('detail', Number(b.dataset.open));
+  else if (b.id === 'gps') startGPS();
+  else if (b.id === 'reset' && confirm('¿Borrar todas las respuestas de esta actividad?')) {
+    void persist('reset', next => {
+      next.answers = {};
+      next.started = false;
+      next.generation = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+    });
+  } else if (b.id === 'theme') {
+    void persist('theme', next => {
+      next.theme = themes[(themes.indexOf(next.theme) + 1) % themes.length];
+    });
+  }
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && watch !== null) stopGPS();
+  if (!document.hidden && !pendingWrites && !memoryOnly) {
+    const next = readState();
+    if (next && JSON.stringify(next) !== JSON.stringify(state)) syncView(adopt(next));
+  }
+});
+render();
+storageStatus();
 
 const offlineStatus = document.querySelector('#offline-status');
-if ('serviceWorker' in navigator && isSecureContext) {
-  navigator.serviceWorker.register('./sw.js').then(async () => {
-    if (!navigator.serviceWorker.controller) {
-      await new Promise(resolve => navigator.serviceWorker.addEventListener('controllerchange', resolve, {once:true}));
-    }
-    offlineStatus.textContent = 'Disponible sin conexión';
-  }).catch(() => {
-    offlineStatus.textContent = 'Descarga sin conexión no disponible';
-  });
+let offlineCheck = 0;
+let installTimer;
+function offlineUnavailable() {
+  offlineStatus.textContent = 'Descarga sin conexión no disponible';
 }
+function verifyOffline() {
+  const controller = navigator.serviceWorker.controller;
+  if (!controller) return;
+  clearTimeout(installTimer);
+  const check = ++offlineCheck;
+  const channel = new MessageChannel();
+  const finish = complete => {
+    clearTimeout(timeout);
+    channel.port1.close();
+    if (check !== offlineCheck) return;
+    if (complete) offlineStatus.textContent = 'Disponible sin conexión';
+    else offlineUnavailable();
+  };
+  const timeout = setTimeout(() => finish(false), 5000);
+  channel.port1.onmessage = event => finish(event.data?.complete === true);
+  try { controller.postMessage({ type: 'VERIFY_OFFLINE' }, [channel.port2]); }
+  catch { finish(false); }
+}
+if ('serviceWorker' in navigator && isSecureContext) {
+  navigator.serviceWorker.addEventListener('controllerchange', verifyOffline);
+  installTimer = setTimeout(offlineUnavailable, 20000);
+  if (navigator.serviceWorker.controller) verifyOffline();
+  navigator.serviceWorker.register('./sw.js').then(registration => {
+    if (navigator.serviceWorker.controller) verifyOffline();
+    const observe = worker => {
+      if (!worker) return;
+      worker.addEventListener('statechange', () => {
+        if (worker.state === 'redundant' && !navigator.serviceWorker.controller) offlineUnavailable();
+      });
+    };
+    observe(registration.installing);
+    registration.addEventListener('updatefound', () => observe(registration.installing));
+  }).catch(() => {
+    if (!navigator.serviceWorker.controller) offlineUnavailable();
+  });
+  window.addEventListener('online', verifyOffline);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) verifyOffline();
+  });
+} else offlineUnavailable();
 
 const installPanel = document.querySelector('#install-panel');
 const installButton = document.querySelector('#install-app');

@@ -2,7 +2,7 @@
 
 PWA estática en castellano para visitar ocho inscripciones romanas de Valencia. Las cuatro zonas se muestran en un callejero local. El número de zona marca el orden de la visita. Dentro de la plaza, las fichas IV–VIII comparten una referencia geográfica orientativa.
 
-La web guarda en el navegador las respuestas elegidas, las últimas respuestas comprobadas y el tema. La ubicación se activa voluntariamente, se usa en memoria y el seguimiento termina al ocultar la página o acceder a Resultados. La puntuación sobre 24 se basa en las últimas respuestas comprobadas. El progreso de la versión anterior conserva sus respuestas y puntos. La ficha se completa al comprobar también la pregunta de clasificación.
+La web guarda en el navegador las respuestas elegidas, las últimas respuestas comprobadas y el tema. La ubicación se activa voluntariamente, se usa en memoria y el seguimiento termina al ocultar la página o acceder a Resultados. La puntuación sobre 26 se basa en las últimas respuestas comprobadas. El progreso previo conserva las respuestas a preguntas no modificadas. La antigua pregunta IV.1 se invalida si solo se guardó su índice, para no atribuir una respuesta a una pregunta diferente; las dos preguntas nuevas quedan pendientes. La ficha se completa al comprobar todas sus preguntas, incluida la de clasificación.
 
 ## Pruebas y GitHub Pages
 
@@ -10,7 +10,7 @@ Desde la carpeta que contiene el repositorio, ejecuta `python3 -m http.server 87
 
 La raíz del repositorio contiene todos los recursos necesarios para Pages. Una vez autorizada la publicación, usa la carpeta raíz de la rama aprobada como origen. La aplicación utiliza URLs relativas y funciona bajo el prefijo del proyecto. Sube todos los recursos de cada versión juntos, añade cada archivo nuevo a `sw.js` e incrementa su versión de caché. Cerrar todas las pestañas y ventanas de la aplicación permite activar un worker actualizado que esté en espera. La clave de progreso se conserva entre versiones.
 
-La prueba automatizada ejecutada en Brave incluye la recarga con la red deshabilitada, con comprobación de mapa, fotografía y puntuación, además de las ocho fichas, las 24 preguntas, navegación, reinicio y temas. El GPS y los tamaños de pantalla son simulaciones. Quedan pendientes la instalación desde el menú del navegador, la comprobación en iPhone, Android e iPad físicos, la comprobación de la URL definitiva en GitHub Pages.
+La prueba automatizada ejecutada en Brave incluye la recarga con la red deshabilitada, con comprobación de mapa, fotografía y puntuación, además de las ocho fichas, las 26 preguntas, navegación, reinicio y temas. El GPS y los tamaños de pantalla son simulaciones. Quedan pendientes la instalación desde el menú del navegador, la comprobación en iPhone, Android e iPad físicos, la comprobación de la URL definitiva en GitHub Pages.
 
 ## Edición y procedencia
 
@@ -74,3 +74,13 @@ Cinzel, de Natanael Gama, se sirve localmente en los títulos de marca y los num
 - Marcellus, del [repositorio Google Fonts](https://github.com/google/fonts/tree/main/ofl/marcellus), bajo SIL Open Font License 1.1; licencia local en `fonts/OFL-Marcellus.txt`.
 - Source Serif 4, de Adobe, variantes Regular, Italic y Semibold de la [rama release oficial](https://github.com/adobe-fonts/source-serif/tree/release/WOFF2/OTF), bajo SIL Open Font License 1.1; licencia local en `fonts/OFL-SourceSerif4.txt`.
 - Fuentes originales sin modificaciones y servidas localmente. Los caracteres no cubiertos usan familias de reserva. Cinzel se mantiene en la marca y numerales.
+
+### Revisión de actividades
+
+La pregunta IV.1 se refiere a la función de todo el sintagma dativo *Asclepio deo*, no a la relación interna entre sus dos constituyentes. Se incorporan dos preguntas de selección múltiple adaptadas de `ACTIVIDAD INSCRIPCIONES.pdf` (prueba 1, pregunta 2; prueba 4, pregunta 2). En la primera se distingue *nomen* de *praenomen* y se evita presentar el origen servil como un hecho probado. Hay 26 preguntas en ocho fichas (cuatro en I y IV; tres en las restantes).
+
+### Recapitulación final
+
+Al comprobar todas las preguntas de las ocho inscripciones se desbloquean cinco preguntas de recapitulación filológica. Se guardan con la misma persistencia y autocorrección que las fichas, pero su puntuación (sobre 5) se muestra separada de la del recorrido (sobre 26). El reinicio borra ambas. No se requiere acertar todas las preguntas del recorrido para acceder.
+
+La recapitulación definitiva combina los casos de dedicante y destinatario en una sola pregunta y utiliza ejemplos distintos para el desarrollo de *M.* y *F.*. Las otras dos preguntas tratan la grafía V/U y la distinción entre desarrollo de abreviaturas y restitución editorial. No se reproduce el antiguo cuestionario de recapitulación.

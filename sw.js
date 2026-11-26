@@ -2,7 +2,8 @@
 
 const scope = self.registration.scope;
 const prefix = 'valentia-epigraphica:' + scope + ':';
-const version = prefix + '1.0-rc12-pompeian';
+const release = '1.0-rc17-recap-final';
+const version = prefix + release;
 const index = new URL('index.html', scope).href;
 const assets = new Set([
   'index.html', 'style.css', 'data.js', 'map.js', 'app.js',
@@ -34,6 +35,43 @@ self.addEventListener('activate', event => {
       .map(key => caches.delete(key)));
     await self.clients.claim();
   })());
+});
+
+// A controller alone does not prove that the browser has retained every
+// resource. Ask the active worker to verify its own versioned cache.
+async function verifyAssets() {
+  const cache = await caches.open(version);
+  const missing = async () => {
+    const results = await Promise.all([...assets].map(async url => {
+      const response = await cache.match(url);
+      return response && response.ok ? null : url;
+    }));
+    return results.filter(Boolean);
+  };
+  let absent = await missing();
+  if (!absent.length) return true;
+  // Refill only when the HTTP origin still serves this exact worker release.
+  // Never fill an old cache with resources from a newer deployment.
+  try {
+    const response = await fetch(new URL('sw.js', scope), { cache: 'no-store' });
+    const marker = "const release = '" + release + "';";
+    if (!response.ok || !(await response.text()).includes(marker)) return false;
+    await cache.addAll(absent.map(url => new Request(url, { cache: 'reload' })));
+    absent = await missing();
+  } catch {
+    return false;
+  }
+  return absent.length === 0;
+}
+
+self.addEventListener('message', event => {
+  if (event.data?.type !== 'VERIFY_OFFLINE' || !event.ports[0]) return;
+  const port = event.ports[0];
+  event.waitUntil(verifyAssets().then(complete => {
+    port.postMessage({ complete });
+  }).catch(() => {
+    port.postMessage({ complete: false });
+  }));
 });
 
 self.addEventListener('fetch', event => {
