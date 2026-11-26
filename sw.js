@@ -2,7 +2,7 @@
 
 const scope = self.registration.scope;
 const prefix = 'valentia-epigraphica:' + scope + ':';
-const release = '1.0-rc15-recap';
+const release = '1.0-rc16-recap-final';
 const version = prefix + release;
 const index = new URL('index.html', scope).href;
 const assets = new Set([

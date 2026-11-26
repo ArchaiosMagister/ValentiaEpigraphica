@@ -562,54 +562,54 @@ globalThis.VE_DATA = {
     "title": "Recapitulación final",
     "questions": [
       {
-        "text": "En las inscripciones I y II, ¿en qué caso aparecen los nombres de quienes dedican los monumentos (*Caius Riccius Atimetus*, *Lucius Rubrius Eutyches*)?",
+        "text": "¿En qué casos aparecen habitualmente los dedicantes y los dedicatarios, respectivamente?",
         "options": [
-          "Dativo",
-          "Nominativo",
-          "Genitivo"
+          "Dativo y nominativo",
+          "Nominativo y dativo",
+          "Nominativo y genitivo"
         ],
         "correct": 1,
-        "explanation": "Los dedicantes aparecen en nominativo: son el sujeto de un verbo de dedicación que suele quedar sobreentendido."
+        "explanation": "El dedicante aparece habitualmente en nominativo, como sujeto del verbo sobreentendido; el destinatario, en dativo."
       },
       {
-        "text": "En las dedicatorias a *Quinto Iunio Crati*, *Asclepio deo* y *Sertoriæ Maximæ*, ¿qué caso identifica a la persona o divinidad homenajeada?",
+        "text": "¿Cómo desarrollarías la abreviatura *M.* en *M. Aquilio Aquilino* y en *M. Antonius Avitus*, respectivamente?",
         "options": [
-          "Genitivo",
-          "Acusativo",
-          "Dativo"
+          "Marcus y Marco",
+          "Marci y Marcus",
+          "Marco y Marcus"
         ],
         "correct": 2,
-        "explanation": "El dativo expresa el destinatario de la dedicatoria, aunque el verbo no aparezca escrito."
+        "explanation": "*Marco* está en dativo y *Marcus* en nominativo. El contexto permite determinar la flexión del nombre abreviado."
       },
       {
-        "text": "¿Cómo se desarrollan las abreviaturas *Q.* en *Q. Iunio Crati* y *M.* en *M. Antonius Avitus*, teniendo en cuenta sus respectivos casos?",
+        "text": "¿Cómo desarrollarías la abreviatura *F.* en *Antoniæ M. F. Lepidæ* y en *Antonia M. F. Lepida*, respectivamente?",
         "options": [
-          "Quinto y Marcus",
-          "Quintus y Marco",
-          "Quinti y Marci"
+          "Filiæ y filia",
+          "Filia y filiæ",
+          "Filiæ y filius"
         ],
         "correct": 0,
-        "explanation": "*Q.* representa *Quinto* (dativo) y *M.* representa *Marcus* (nominativo). El contexto determina el caso del nombre abreviado."
+        "explanation": "La filiación concuerda en caso con el nombre femenino: *filiæ* en dativo en la inscripción VI y *filia* en nominativo en la V."
       },
       {
-        "text": "En *Sertoriæ Q. f. Maximæ*, ¿qué desarrollo corresponde a *Q. f.*?",
+        "text": "¿Qué particularidad gráfica presentan las palabras *VXORI* y *AVGVSTALIS* respecto a nuestra escritura habitual?",
         "options": [
-          "Quintus filius",
-          "Quinto filio",
-          "Quinti filiæ"
+          "La X representa una doble S",
+          "La V representa la vocal U",
+          "La I sustituye a la letra E"
+        ],
+        "correct": 1,
+        "explanation": "En la escritura monumental latina se emplea V tanto para la vocal U como para el sonido consonántico representado modernamente por V."
+      },
+      {
+        "text": "¿Qué diferencia hay entre los paréntesis de *LEG(ATVS)* y los corchetes de *[PI]ETATE*?",
+        "options": [
+          "Los paréntesis restituyen letras perdidas y los corchetes desarrollan abreviaturas",
+          "Ambos signos señalan letras borradas de manera intencionada",
+          "Los paréntesis desarrollan una abreviatura y los corchetes restituyen letras no conservadas"
         ],
         "correct": 2,
-        "explanation": "*Quinti* es genitivo de filiación («de Quinto»); *filiæ* está en dativo, como *Sertoriæ Maximæ* («a Sertoria Máxima, hija de Quinto»)."
-      },
-      {
-        "text": "En la transcripción de Julia Mamea aparecen dobles corchetes, como *[[IVLIÆ]]*. ¿Qué indican en la edición de esta inscripción?",
-        "options": [
-          "Letras borradas intencionadamente en el monumento",
-          "Abreviaturas de los nombres propios",
-          "Letras añadidas por el editor para desarrollar una abreviatura"
-        ],
-        "correct": 0,
-        "explanation": "Los dobles corchetes señalan un texto borrado en el soporte. Los paréntesis, en cambio, se usan para desarrollar abreviaturas."
+        "explanation": "En esta edición, los paréntesis desarrollan una abreviatura y los corchetes cuadrados simples indican una restitución editorial de letras perdidas."
       }
     ]
   }

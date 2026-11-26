@@ -82,3 +82,5 @@ La pregunta IV.1 se refiere a la función de todo el sintagma dativo *Asclepio d
 ### Recapitulación final
 
 Al comprobar todas las preguntas de las ocho inscripciones se desbloquean cinco preguntas de recapitulación filológica. Se guardan con la misma persistencia y autocorrección que las fichas, pero su puntuación (sobre 5) se muestra separada de la del recorrido (sobre 26). El reinicio borra ambas. No se requiere acertar todas las preguntas del recorrido para acceder.
+
+La recapitulación definitiva combina los casos de dedicante y destinatario en una sola pregunta y utiliza ejemplos distintos para el desarrollo de *M.* y *F.*. Las otras dos preguntas tratan la grafía V/U y la distinción entre desarrollo de abreviaturas y restitución editorial. No se reproduce el antiguo cuestionario de recapitulación.
