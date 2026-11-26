@@ -2,11 +2,12 @@
 
 const scope = self.registration.scope;
 const prefix = 'valentia-epigraphica:' + scope + ':';
-const version = prefix + '1.0-rc6';
+const version = prefix + '1.0-rc8';
 const index = new URL('index.html', scope).href;
 const assets = new Set([
   'index.html', 'style.css', 'data.js', 'map.js', 'app.js',
   'manifest.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png',
+  'fonts/cinzel-600.woff2',
   'photos/crates.jpg',
   'photos/eufemo.jpg',
   'photos/aquilino.jpg',

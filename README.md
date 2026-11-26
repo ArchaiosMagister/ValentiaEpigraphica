@@ -2,7 +2,7 @@
 
 PWA estática en castellano para visitar ocho inscripciones romanas de Valencia. Las cuatro zonas se muestran en un callejero local. El número de zona marca el orden de la visita. Dentro de la plaza, las fichas IV–VIII comparten una referencia geográfica orientativa.
 
-La web guarda en el navegador las respuestas elegidas, las últimas respuestas comprobadas y el tema. La ubicación se activa voluntariamente, se usa en memoria y el seguimiento termina al ocultar la página o acceder a Resultados. La puntuación se basa en las últimas respuestas comprobadas.
+La web guarda en el navegador las respuestas elegidas, las últimas respuestas comprobadas y el tema. La ubicación se activa voluntariamente, se usa en memoria y el seguimiento termina al ocultar la página o acceder a Resultados. La puntuación sobre 24 se basa en las últimas respuestas comprobadas. El progreso de la versión anterior conserva sus respuestas y puntos. La ficha se completa al comprobar también la pregunta de clasificación.
 
 ## Pruebas y GitHub Pages
 
@@ -10,7 +10,7 @@ Desde la carpeta que contiene el repositorio, ejecuta `python3 -m http.server 87
 
 La raíz del repositorio contiene todos los recursos necesarios para Pages. Una vez autorizada la publicación, usa la carpeta raíz de la rama aprobada como origen. La aplicación utiliza URLs relativas y funciona bajo el prefijo del proyecto. Sube todos los recursos de cada versión juntos, añade cada archivo nuevo a `sw.js` e incrementa su versión de caché. Cerrar todas las pestañas y ventanas de la aplicación permite activar un worker actualizado que esté en espera. La clave de progreso se conserva entre versiones.
 
-La prueba automatizada ejecutada en Brave incluye la recarga con la red deshabilitada, con comprobación de mapa, fotografía y puntuación, además de las ocho fichas, las 16 preguntas, navegación, reinicio y temas. El GPS y los tamaños de pantalla son simulaciones. Quedan pendientes la instalación desde el menú del navegador, la comprobación en iPhone, Android e iPad físicos, la comprobación de la URL definitiva en GitHub Pages.
+La prueba automatizada ejecutada en Brave incluye la recarga con la red deshabilitada, con comprobación de mapa, fotografía y puntuación, además de las ocho fichas, las 24 preguntas, navegación, reinicio y temas. El GPS y los tamaños de pantalla son simulaciones. Quedan pendientes la instalación desde el menú del navegador, la comprobación en iPhone, Android e iPad físicos, la comprobación de la URL definitiva en GitHub Pages.
 
 ## Edición y procedencia
 
@@ -64,3 +64,7 @@ Para incorporar otra fotografía, guarda su archivo en `photos/`, añade autorí
 La [panorámica del pavimento](https://maps.app.goo.gl/rDugBBjJE9LA7HLS9) apunta hacia la lápida conmemorativa de la fundación de Valentia, una pieza distinta de Probo. Se conserva como referencia documental. [Guía turística institucional de València](https://multimedia.comunitatvalenciana.com/971D84CDBDC64EEEBB47EB975D684C0F/doc/5D4F9004F45D45ED9DB6BBDE86DD330E/guia_completa_valencia_castellano.pdf)
 
 Los enlaces externos son opcionales y no reciben la posición medida por la aplicación. El callejero y las indicaciones textuales siguen disponibles sin conexión.
+
+## Tipografía
+
+Cinzel, de Natanael Gama, se sirve localmente en los títulos de marca y los numerales del listado. Consulta la [licencia SIL Open Font License 1.1](fonts/OFL-Cinzel.txt).
