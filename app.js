@@ -77,3 +77,46 @@ if ('serviceWorker' in navigator && isSecureContext) {
     offlineStatus.textContent = 'Descarga sin conexión no disponible';
   });
 }
+
+const installPanel = document.querySelector('#install-panel');
+const installButton = document.querySelector('#install-app');
+const installHelp = document.querySelector('#install-help');
+const standalone = matchMedia('(display-mode: standalone)');
+let installPrompt;
+
+installPanel.hidden = standalone.matches || navigator.standalone === true;
+
+window.addEventListener('beforeinstallprompt', event => {
+  event.preventDefault();
+  installPrompt = event;
+});
+
+window.addEventListener('appinstalled', () => {
+  installPrompt = undefined;
+  installPanel.hidden = true;
+});
+
+installButton.addEventListener('click', async () => {
+  if (installPrompt) {
+    const prompt = installPrompt;
+    installPrompt = undefined;
+    try {
+      const choice = await prompt.prompt();
+      if (choice?.outcome === 'accepted') installPanel.hidden = true;
+      return;
+    } catch {
+      // Offer the browser menu when the native prompt is unavailable.
+    }
+  }
+
+  const appleMobile = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const safariDesktop = !appleMobile && /Version\/.*Safari\//.test(navigator.userAgent);
+  installHelp.textContent = appleMobile
+    ? 'En Safari, toca Compartir y «Añadir a pantalla de inicio». Si aparece «Abrir como app web», actívalo.'
+    : safariDesktop
+      ? 'En Safari, abre Archivo y elige «Añadir al Dock».'
+      : 'Abre el menú del navegador y busca «Instalar aplicación» o «Añadir a pantalla de inicio».';
+  installHelp.hidden = !installHelp.hidden;
+  installButton.setAttribute('aria-expanded', String(!installHelp.hidden));
+});
