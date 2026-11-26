@@ -337,20 +337,34 @@ function attachQuiz(x) {
       return input ? Number(input.value) : null;
     });
   }
+  let renderedDraft = x.questions.map((q, i) => draft[i] ?? null);
   let renderedRecord = JSON.stringify(a);
   syncDetail = () => {
     const current = answers[x.id] || {};
     const fingerprint = JSON.stringify(current);
     if (fingerprint === renderedRecord) return;
     renderedRecord = fingerprint;
-    const values = current.draft || [];
-    for (const input of form.querySelectorAll('input[type=radio]')) {
-      input.checked = values[Number(input.name.slice(1))] === Number(input.value);
+    const values = x.questions.map((q, i) => current.draft?.[i] ?? null);
+    const visible = visibleAnswers();
+    // Only synchronize a group whose stored value actually changed.
+    // A native radio activation can precede its change event, particularly
+    // when a different tab is also committing progress. Never overwrite
+    // an in-flight local choice with a previous persisted snapshot.
+    for (const [i, value] of values.entries()) {
+      if (value === renderedDraft[i] || value === visible[i] || visible[i] !== renderedDraft[i]) continue;
+      const inputs = form.querySelectorAll('input[name=q' + i + ']');
+      if (value === null) inputs.forEach(input => { input.checked = false; });
+      else {
+        const input = [...inputs].find(input => Number(input.value) === value);
+        if (input) input.checked = true;
+      }
     }
-    check.disabled = !x.questions.every((q, i) => Number.isInteger(values[i]));
+    renderedDraft = values;
+    const displayed = visibleAnswers();
+    check.disabled = !displayed.every(Number.isInteger);
     document.querySelector('#completion-status').textContent = x.roman + ' · ' +
       (complete(x) ? 'Actividad completada' : 'Actividad pendiente');
-    showFeedback(complete(x) && x.questions.every((q, i) => values[i] === current.graded[i])
+    showFeedback(complete(x) && displayed.every((value, i) => value === current.graded[i])
       ? current.graded : null);
   };
   showFeedback(graded ? draft : null);

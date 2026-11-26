@@ -10,7 +10,7 @@ const root = path.resolve(__dirname, '..');
 const key = 'valentia-epigraphica-v1';
 const engine = process.env.VE_BROWSER || 'chromium';
 const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.webmanifest':'application/manifest+json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.woff2':'font/woff2','.ttf':'font/ttf'};
-let release = '1.0-rc16-recap-final';
+let release = '1.0-rc17-recap-final';
 let failPhoto = false;
 const server = http.createServer(async (req, res) => {
   try {
@@ -22,7 +22,7 @@ const server = http.createServer(async (req, res) => {
     const file = path.resolve(root, relative);
     if (!file.startsWith(root + path.sep)) { res.writeHead(403).end(); return; }
     let data = await fs.readFile(file);
-    if (relative === 'sw.js') data = data.toString().replace("const release = '1.0-rc16-recap-final';", "const release = '" + release + "';");
+    if (relative === 'sw.js') data = data.toString().replace("const release = '1.0-rc17-recap-final';", "const release = '" + release + "';");
     res.writeHead(200, {'Content-Type':types[path.extname(file)] || 'application/octet-stream','Cache-Control':'no-store'}).end(data);
   } catch { res.writeHead(404).end(); }
 });
@@ -55,7 +55,26 @@ async function read(page) { return page.evaluate(key => JSON.parse(localStorage.
     const a = await context.newPage(), b = await context.newPage();
     await a.goto(base); await ready(a); await start(a);
     await b.goto(base); await ready(b);
-    await Promise.all([grade(a,1),grade(b,2)]);
+    // WebKit has one foreground window; concurrent physical mouse actions
+    // across windows can steal focus. Open each form using real navigation,
+    // then dispatch native radio activations in both documents concurrently.
+    // This exercises the actual click/change/persistence handlers without
+    // making the two virtual mice fight for the foreground.
+    await open(a,1);
+    await open(b,2);
+    const activate = (page, item) => page.evaluate(choices => {
+      for (const [i, value] of choices.entries()) {
+        const radio = document.querySelector('input[name=q' + i + '][value="' + value + '"]');
+        radio.click();
+        if (!radio.checked) throw new Error('Radio activation lost: ' + i);
+      }
+      document.querySelector('#check').click();
+    }, item.questions.map(q => q.correct));
+    await Promise.all([activate(a,items[0]),activate(b,items[1])]);
+    for (const [p,item] of [[a,items[0]],[b,items[1]]]) {
+      await wait(p,n => document.querySelectorAll('.feedback.correct:not([hidden])').length === n,item.questions.length);
+      assert.equal(await p.locator('input:checked').count(),item.questions.length);
+    }
     await a.locator('nav [data-tab=results]').click();
     await b.locator('nav [data-tab=results]').click();
     for (const p of [a,b]) await wait(p, () => document.querySelector('.score')?.textContent === '7/26');
@@ -102,14 +121,14 @@ async function read(page) { return page.evaluate(key => JSON.parse(localStorage.
     await a.evaluate(() => window.dispatchEvent(new Event('online')));
     await ready(a);
     // Update with a waiting worker, retaining the progress across activation.
-    release = '1.0-rc16-recap-final-fixture-update';
+    release = '1.0-rc17-recap-final-fixture-update';
     await a.evaluate(async () => (await navigator.serviceWorker.getRegistration()).update());
     await wait(a, async () => !!(await navigator.serviceWorker.getRegistration()).waiting);
     await b.close(); await a.close();
     const next = await context.newPage();
     await next.goto(base); await ready(next);
     await wait(next, async () => (await caches.keys()).some(k => k.endsWith('fixture-update')) &&
-      !(await caches.keys()).some(k => k.endsWith('1.0-rc16-recap-final')));
+      !(await caches.keys()).some(k => k.endsWith('1.0-rc17-recap-final')));
     await next.locator('nav [data-tab=results]').click();
     await wait(next, () => document.querySelector('.score')?.textContent === '4/26');
     await context.close();
