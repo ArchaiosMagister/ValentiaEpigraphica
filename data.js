@@ -31,8 +31,8 @@ globalThis.VE_DATA = {
           "explanation": "La manumisión es el acto por el que un esclavo obtiene la libertad."
         }
       ],
-      "lat": 39.473185,
-      "lon": -0.374407,
+      "lat": 39.4732235,
+      "lon": -0.3744353,
       "zone": 1,
       "photos": [
         {
@@ -45,7 +45,9 @@ globalThis.VE_DATA = {
           "license": "CC BY-SA 3.0",
           "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/"
         }
-      ]
+      ],
+      "locationHint": "En la fachada de la calle Vidal, en la esquina del edificio de Banca March.",
+      "streetView": "https://maps.app.goo.gl/mZMrWqVapPmpvKMf8"
     },
     {
       "id": 2,
@@ -78,9 +80,11 @@ globalThis.VE_DATA = {
           "explanation": "Los séviros augustales estaban vinculados al culto del emperador."
         }
       ],
-      "lat": 39.474092,
-      "lon": -0.372696,
-      "zone": 2
+      "lat": 39.4740542,
+      "lon": -0.3726603,
+      "zone": 2,
+      "locationHint": "Busca la inscripción empotrada en la fachada del número 1.",
+      "streetView": "https://maps.app.goo.gl/MBCYQ3S4md1jqhLQ9"
     },
     {
       "id": 3,
@@ -113,9 +117,11 @@ globalThis.VE_DATA = {
           "explanation": "XXXXVI = 40 + 6."
         }
       ],
-      "lat": 39.475384,
-      "lon": -0.374807,
-      "zone": 3
+      "lat": 39.475471,
+      "lon": -0.3747699,
+      "zone": 3,
+      "locationHint": "En el muro del Palacio Arzobispal que da a la calle Barchilla, a unos dos metros del suelo.",
+      "streetView": "https://maps.app.goo.gl/RP1HGwqWSwQJXjio6"
     },
     {
       "id": 4,
@@ -148,9 +154,11 @@ globalThis.VE_DATA = {
           "explanation": "Asclepio era el dios de la medicina."
         }
       ],
-      "lat": 39.476233,
-      "lon": -0.374992,
-      "zone": 4
+      "lat": 39.4762275,
+      "lon": -0.3750817,
+      "zone": 4,
+      "locationHint": "En el zócalo de la fachada de la Basílica de los Desamparados que da a la plaza.",
+      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA"
     },
     {
       "id": 5,
@@ -183,7 +191,9 @@ globalThis.VE_DATA = {
           "explanation": "Marco Antonio Avito era su marido y Antonia Lépida, su hija."
         }
       ],
-      "zone": 4
+      "zone": 4,
+      "locationHint": "En el zócalo de la fachada de la Basílica de los Desamparados que da a la plaza.",
+      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA"
     },
     {
       "id": 6,
@@ -216,7 +226,9 @@ globalThis.VE_DATA = {
           "explanation": "LIB(ERTVS) identifica al dedicante como liberto de Antonia."
         }
       ],
-      "zone": 4
+      "zone": 4,
+      "locationHint": "En el zócalo de la fachada de la Basílica de los Desamparados que da a la plaza.",
+      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA"
     },
     {
       "id": 7,
@@ -249,7 +261,9 @@ globalThis.VE_DATA = {
           "explanation": "La condena podía manifestarse mediante la eliminación de nombres e imágenes."
         }
       ],
-      "zone": 4
+      "zone": 4,
+      "locationHint": "En el zócalo de la fachada de la Basílica de los Desamparados que da a la plaza.",
+      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA"
     },
     {
       "id": 8,
@@ -282,7 +296,9 @@ globalThis.VE_DATA = {
           "explanation": "El texto lo identifica como legatus iuridicus."
         }
       ],
-      "zone": 4
+      "zone": 4,
+      "locationHint": "En el zócalo de la fachada de la Basílica de los Desamparados que da a la plaza.",
+      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA"
     }
   ]
 };

@@ -10,7 +10,7 @@ Desde la carpeta que contiene el repositorio, ejecuta `python3 -m http.server 87
 
 La raíz del repositorio contiene todos los recursos necesarios para Pages. Una vez autorizada la publicación, usa la carpeta raíz de la rama aprobada como origen. La aplicación utiliza URLs relativas y funciona bajo el prefijo del proyecto. Sube todos los recursos de cada versión juntos, añade cada archivo nuevo a `sw.js` e incrementa su versión de caché. Cerrar todas las pestañas y ventanas de la aplicación permite activar un worker actualizado que esté en espera. La clave de progreso se conserva entre versiones.
 
-La prueba automatizada ejecutada en Brave incluye la recarga con la red deshabilitada, con comprobación de mapa, fotografía y puntuación, además de las ocho fichas, las 16 preguntas, navegación, reinicio y temas. El GPS y los tamaños de pantalla son simulaciones. Quedan pendientes la instalación desde el menú del navegador, la comprobación en iPhone, Android e iPad físicos, el recorrido a pie y la comprobación de la URL definitiva en GitHub Pages.
+La prueba automatizada ejecutada en Brave incluye la recarga con la red deshabilitada, con comprobación de mapa, fotografía y puntuación, además de las ocho fichas, las 16 preguntas, navegación, reinicio y temas. El GPS y los tamaños de pantalla son simulaciones. Quedan pendientes la instalación desde el menú del navegador, la comprobación en iPhone, Android e iPad físicos, la comprobación de la URL definitiva en GitHub Pages.
 
 ## Edición y procedencia
 
@@ -34,7 +34,20 @@ La transcripción didáctica usa mayúsculas y V epigráfica, Æ para AE según 
 
 ## Cartografía y fotografías
 
-- El callejero contiene vías de un extracto API de OpenStreetMap para el rectángulo `-0.3761,39.4725,-0.3719,39.4770`. El archivo `map.js` contiene las geometrías proyectadas de dicho extracto bajo ODbL. Las posiciones de las cuatro zonas vienen de la versión inicial y requieren cotejo sobre el terreno. [OpenStreetMap y ODbL](https://www.openstreetmap.org/copyright)
+- El callejero contiene vías de un extracto API de OpenStreetMap para el rectángulo `-0.3761,39.4725,-0.3719,39.4770`. El archivo `map.js` contiene las geometrías proyectadas de dicho extracto bajo ODbL. Las cuatro referencias de proximidad corresponden a las posiciones de cámara de las panorámicas aportadas por el docente. Son puntos de aproximación a las fachadas. [OpenStreetMap y ODbL](https://www.openstreetmap.org/copyright)
 - La ruta de Elia.S.D. sirvió para identificar lugares. El GPX bruto y la licencia de redistribución del trazado heredado siguen pendientes de comprobación. El callejero usa las zonas numeradas para mostrar la secuencia. [Wikiloc](https://es.wikiloc.com/rutas-a-pie/ruta-por-la-inscripciones-romanas-de-valencia-36562169)
 - Ficha I, fotografía de Joanbanjo, CC BY-SA 3.0, reducida a 1400 píxeles y recomprimida. [Ficha de Commons](https://commons.wikimedia.org/wiki/File:Inscripció_romana_al_carrer_de_Vidal_de_València.JPG)
 - Para incorporar fotografías propias a II–VIII, guarda los archivos en `photos/` y añade sus datos a la lista `photos` de cada ficha en `data.js`, siguiendo el ejemplo de I. El formato admite varias imágenes por ficha, incluida una vista contextual. El toque abre la imagen local a tamaño completo. Incluye las imágenes en la lista del service worker para su uso sin conexión.
+
+### Cotejo remoto de las ubicaciones
+
+| Zona | Referencia |
+| --- | --- |
+| I | [Panorámica de la esquina en calle Vidal](https://maps.app.goo.gl/mZMrWqVapPmpvKMf8). La etiqueta de Oxfam corresponde a un comercio cercano. La referencia didáctica es la fachada de Vidal en la esquina del edificio de Banca March. Corell sitúa la pieza en esta calle. |
+| II | [Panorámica de Trinquete de los Caballeros](https://maps.app.goo.gl/MBCYQ3S4md1jqhLQ9). Corell sitúa el pedestal en la fachada del número 1. |
+| III | [Panorámica de Barchilla](https://maps.app.goo.gl/RP1HGwqWSwQJXjio6). Corell sitúa la pieza en el muro del Palacio Arzobispal, a unos dos metros del suelo. |
+| IV–VIII | [Panorámica de la fachada de la Basílica](https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA). Pereira Menaut sitúa también en el muro occidental de la Basílica el pedestal de Probo, ficha VIII. |
+
+La [panorámica del pavimento](https://maps.app.goo.gl/rDugBBjJE9LA7HLS9) apunta hacia la lápida conmemorativa de la fundación de Valentia, una pieza distinta de Probo. Se conserva como referencia documental. [Guía turística institucional de València](https://multimedia.comunitatvalenciana.com/971D84CDBDC64EEEBB47EB975D684C0F/doc/5D4F9004F45D45ED9DB6BBDE86DD330E/guia_completa_valencia_castellano.pdf)
+
+Los enlaces externos son opcionales y no reciben la posición medida por la aplicación. El callejero y las indicaciones textuales siguen disponibles sin conexión.
