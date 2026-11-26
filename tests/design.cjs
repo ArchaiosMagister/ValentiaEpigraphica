@@ -43,7 +43,9 @@ async function loadFonts(page) {
 async function theme(page, value) {
   for (let i = 0; i < 3; i++) {
     if (await page.locator('html').getAttribute('data-theme') === value) return;
+    const previous = await page.locator('html').getAttribute('data-theme');
     await page.locator('#theme').click();
+    await page.waitForFunction(previous => document.documentElement.dataset.theme !== previous, previous);
   }
   assert.equal(await page.locator('html').getAttribute('data-theme'), value);
 }
