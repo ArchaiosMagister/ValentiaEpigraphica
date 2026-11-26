@@ -1,0 +1,45 @@
+name: Validación PWA y diseño
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar Playwright
+        run: npm install --no-save --package-lock=false playwright@1.51.1
+      - name: Instalar navegador
+        run: npx playwright install --with-deps ${{ matrix.engine }}
+      - name: Servir la PWA bajo el prefijo de Pages
+        run: |
+          mkdir -p /tmp/ve-site
+          ln -s "$GITHUB_WORKSPACE" /tmp/ve-site/ValentiaEpigraphica
+          python3 -m http.server 8765 --bind 127.0.0.1 --directory /tmp/ve-site >/tmp/ve-server.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8765/ValentiaEpigraphica/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/ve-server.log
+          exit 1
+      - name: Regresiones funcionales
+        if: matrix.engine == 'chromium'
+        run: node tests/browser.cjs
+      - name: Diseño, fuentes y caché
+        env:
+          VE_BROWSER: ${{ matrix.engine }}
+        run: node tests/design.cjs
