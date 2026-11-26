@@ -64,3 +64,7 @@ Para incorporar otra fotografía, guarda su archivo en `photos/`, añade autorí
 La [panorámica del pavimento](https://maps.app.goo.gl/rDugBBjJE9LA7HLS9) apunta hacia la lápida conmemorativa de la fundación de Valentia, una pieza distinta de Probo. Se conserva como referencia documental. [Guía turística institucional de València](https://multimedia.comunitatvalenciana.com/971D84CDBDC64EEEBB47EB975D684C0F/doc/5D4F9004F45D45ED9DB6BBDE86DD330E/guia_completa_valencia_castellano.pdf)
 
 Los enlaces externos son opcionales y no reciben la posición medida por la aplicación. El callejero y las indicaciones textuales siguen disponibles sin conexión.
+
+## Tipografía
+
+Cinzel, de Natanael Gama, se sirve localmente en los títulos de marca y los numerales del listado. Consulta la [licencia SIL Open Font License 1.1](fonts/OFL-Cinzel.txt).
