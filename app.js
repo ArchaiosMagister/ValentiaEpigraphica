@@ -21,7 +21,7 @@ function save(){try{localStorage.setItem(key,JSON.stringify({answers,theme,start
   const status = document.querySelector('#storage-status');
   status.textContent = storageOK ? '' : 'El progreso solo se conserva mientras esta página permanezca abierta.';
 }
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const item=id=>items.find(x=>x.id===id);const complete=x=>Array.isArray(answers[x.id]?.graded)&&x.questions.every((q,i)=>Number.isInteger(answers[x.id].graded[i]));const count=()=>items.filter(complete).length;const score=()=>items.reduce((s,x)=>s+(complete(x)?x.questions.filter((q,i)=>q.correct===answers[x.id].graded[i]).length:0),0);const zones=[1,2,3,4].map(id=>item(id));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const item=id=>items.find(x=>x.id===id);const complete=x=>Array.isArray(answers[x.id]?.graded)&&x.questions.every((q,i)=>Number.isInteger(answers[x.id].graded[i]));const count=()=>items.filter(complete).length;const points=x=>x.questions.filter((q,i)=>q.correct===answers[x.id]?.graded?.[i]).length;const score=()=>items.reduce((sum,x)=>sum+points(x),0);const totalQuestions=items.reduce((sum,x)=>sum+x.questions.length,0);const zones=[1,2,3,4].map(id=>item(id));
 function hav(a,b,c,d){const r=Math.PI/180,h=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 6371000*2*Math.asin(Math.sqrt(Math.min(1,h)))}
 function proximity(x) {
   if (!position) return 'Ubicación sin señal';
@@ -63,11 +63,23 @@ function inscriptionPhotos(item) {
 }
 function map(){const dots=zones.map(z=>{const [x,y]=xy(z.lat,z.lon);return `<g><circle class="dot" cx="${x}" cy="${y}" r="13"/><text x="${x}" y="${y+4}" text-anchor="middle">${z.zone}</text></g>`}).join('');let user='';if(position){const [x,y]=xy(position.latitude,position.longitude);if(x>=0&&x<=mapWidth&&y>=0&&y<=350)user=`<circle class="accuracy" cx="${x}" cy="${y}" r="${Math.min(200,position.accuracy/111195*scale)}"/><circle class="user" cx="${x}" cy="${y}" r="6"/>`;}return `<svg class="map" viewBox="0 0 ${mapWidth} 350" role="img" aria-label="Callejero del itinerario con cuatro zonas numeradas y el norte arriba">${mapBase}${dots}${user}<path d="M233 35 L233 16 M229 22 L233 16 L237 22" fill="none" stroke="currentColor" stroke-width="2"/><text x="233" y="12" text-anchor="middle" style="fill:currentColor">N</text></svg>`}
 function progress(){return `<div class="row"><span>Inscripciones completadas</span><strong>${count()}/8</strong></div><div class="progress" role="progressbar" aria-label="Inscripciones completadas" aria-valuenow="${count()}" aria-valuemin="0" aria-valuemax="8"><span style="width:${count()/8*100}%"></span></div>`}
+function inscriptionTypes(open = false) {
+  return `<details class="inscription-types" ${open ? 'open' : ''}>
+    <summary>Tipos de inscripciones</summary>
+    <dl>
+      <div><dt>Honorífica</dt><dd>Rinde homenaje a una persona. Busca su nombre, sus cargos o quién le dedica el monumento.</dd></div>
+      <div><dt>Sepulcral</dt><dd>Conmemora a una persona fallecida. Puede indicar su edad o quién encargó el epitafio.</dd></div>
+      <div><dt>Votiva</dt><dd>Se dedica a una divinidad como ofrenda. Busca el nombre del dios o de la diosa y el del dedicante.</dd></div>
+    </dl>
+  </details>`;
+}
+
 function renderWelcome() {
   main.innerHTML = `<section class="card welcome">
     <h2>Ocho inscripciones romanas</h2>
-    <p>Recorre el centro de Valencia, lee cada inscripción en su lugar y responde dos preguntas breves.</p>
+    <p>Recorre el centro de Valencia, lee cada inscripción en su lugar y responde tres preguntas breves.</p>
     <button class="primary wide" data-go="route">Empezar recorrido</button>
+    ${inscriptionTypes(true)}
   </section>`;
 }
 
@@ -80,6 +92,7 @@ function renderRoute() {
       : '<p>Recorrido completado.</p><button class="primary wide" data-go="results">Ver resultados</button>'}
     </div>
     <div class="card">
+      ${inscriptionTypes()}
       <h3>Mapa del recorrido</h3>
       <div id="map">${map()}</div>
       <p class="muted">${mapCaption} El punto azul indica tu posición dentro del plano.</p>
@@ -107,7 +120,7 @@ function transcription(item) {
   </div>`;
 }
 
-function renderDetail(){const x=item(selected);const {closeup,setting}=inscriptionPhotos(x);const a=answers[x.id]||{},draft=a.draft||[],graded=complete(x)&&x.questions.every((q,i)=>draft[i]===a.graded[i]);main.innerHTML=`<button class="back" data-go="list">‹ Todas las inscripciones</button><p class="muted" id="completion-status">${x.roman} · ${complete(x) ? "Actividad completada" : "Actividad pendiente"}</p><h2>${esc(x.title)}</h2><p class="muted">${esc(x.street)} · ${esc(x.date)}</p><div class="card"><div class="row"><strong data-distance="${x.id}">${proximity(x)}</strong><button id="gps">${watch!==null?'Desactivar GPS':'Activar GPS'}</button></div><p id="gps-status" class="muted" role="status">${esc(gpsMessage)}</p><p class="muted">${esc(x.locationHint)}</p><p><a href="${esc(x.streetView)}" target="_blank" rel="noopener noreferrer">Ver la fachada en Street View</a></p><div class="inscription-display inscription-display--${esc(x.frame)}">${closeup}${transcription(x)}</div><details class="inscription-translation"><summary>Traducción</summary><p>${esc(x.translation)}</p></details><details><summary>Contexto histórico</summary><p>${esc(x.context)}</p></details>${setting}</div><form class="card" id="quiz"><h3>Actividades</h3>${x.questions.map((q,i)=>`<fieldset class="question"><legend>${i+1}. ${formatLatinTerms(q.text)}</legend>${q.options.map((o,j)=>`<label class="option"><input type="radio" name="q${i}" value="${j}" ${draft[i]===j?'checked':''}><span>${esc(o)}</span></label>`).join('')}<p class="feedback" hidden></p></fieldset>`).join('')}<button class="primary wide" id="check" type="submit" ${x.questions.every((q,i)=>Number.isInteger(draft[i]))?'':'disabled'}>Comprobar respuestas</button><p class="done quiz-result" role="status"></p></form><div class="actions">${x.id>1?`<button data-open="${x.id-1}">‹ Anterior</button>`:''}${x.id<8?`<button class="next-inscription" data-open="${x.id+1}">Siguiente inscripción · ${item(x.id+1).roman}</button>`:`<button data-go="results">Ver resultados ›</button>`}</div>`;const form = document.querySelector('#quiz');
+function renderDetail(){const x=item(selected);const {closeup,setting}=inscriptionPhotos(x);const a=answers[x.id]||{},draft=a.draft||[],graded=complete(x)&&x.questions.every((q,i)=>draft[i]===a.graded[i]);main.innerHTML=`<button class="back" data-go="list">‹ Todas las inscripciones</button><p class="muted" id="completion-status">${x.roman} · ${complete(x) ? "Actividad completada" : "Actividad pendiente"}</p><h2>${esc(x.title)}</h2><p class="muted">${esc(x.street)} · ${esc(x.date)}</p><div class="card"><div class="row"><strong data-distance="${x.id}">${proximity(x)}</strong><button id="gps">${watch!==null?'Desactivar GPS':'Activar GPS'}</button></div><p id="gps-status" class="muted" role="status">${esc(gpsMessage)}</p><p class="muted">${esc(x.locationHint)}</p><p><a href="${esc(x.streetView)}" target="_blank" rel="noopener noreferrer">Ver la fachada en Street View</a></p><div class="inscription-display inscription-display--${esc(x.frame)}">${closeup}${transcription(x)}</div><details class="inscription-translation"><summary>Traducción</summary><p>${esc(x.translation)}</p></details><details><summary>Contexto histórico</summary><p>${formatLatinTerms(x.context)}</p></details>${setting}</div><form class="card" id="quiz"><h3>Actividades</h3>${x.questions.map((q,i)=>`<fieldset class="question"><legend>${i+1}. ${formatLatinTerms(q.text)}</legend>${q.options.map((o,j)=>`<label class="option"><input type="radio" name="q${i}" value="${j}" ${draft[i]===j?'checked':''}><span>${esc(o)}</span></label>`).join('')}<p class="feedback" hidden></p></fieldset>`).join('')}<button class="primary wide" id="check" type="submit" ${x.questions.every((q,i)=>Number.isInteger(draft[i]))?'':'disabled'}>Comprobar respuestas</button><p class="done quiz-result" role="status"></p></form><div class="actions">${x.id>1?`<button data-open="${x.id-1}">‹ Anterior</button>`:''}${x.id<8?`<button class="next-inscription" data-open="${x.id+1}">Siguiente inscripción · ${item(x.id+1).roman}</button>`:`<button data-go="results">Ver resultados ›</button>`}</div>`;const form = document.querySelector('#quiz');
   const feedback = [...form.querySelectorAll('.feedback')];
   const result = form.querySelector('.quiz-result');
   const check = form.querySelector('#check');
@@ -124,7 +137,7 @@ function renderDetail(){const x=item(selected);const {closeup,setting}=inscripti
         : '';
     }
     result.textContent = gradedAnswers
-      ? x.questions.filter((q, i) => q.correct === gradedAnswers[i]).length + '/2 respuestas correctas'
+      ? x.questions.filter((q, i) => q.correct === gradedAnswers[i]).length + '/' + x.questions.length + ' respuestas correctas'
       : '';
     nextButton?.classList.toggle('primary', Boolean(gradedAnswers));
   }
@@ -158,7 +171,7 @@ function renderDetail(){const x=item(selected);const {closeup,setting}=inscripti
     enlarge.textContent = enlarged ? 'Reducir texto latino' : 'Ampliar texto latino';
   });
 }
-function renderResults(){main.innerHTML=`<h2>Resultados</h2><div class="card">${progress()}<p class="muted">Puntuación (últimas respuestas comprobadas)</p><div class="score">${score()}/16</div><p>${count()===8?'Recorrido completado.':'Puedes continuar en cualquier momento.'}</p></div><div class="card">${items.map(x=>`<div class="zone"><button data-open="${x.id}">${x.roman}. ${esc(x.title)}</button><strong>${complete(x)?x.questions.filter((q,i)=>q.correct===answers[x.id].graded[i]).length+'/2':'—'}</strong></div>`).join('')}</div><div class="card"><h3>Reiniciar la actividad</h3><p class="muted">Borra las respuestas de este dispositivo para repetir la actividad.</p><button class="wide" id="reset">Reiniciar actividad</button></div>`}
+function renderResults(){main.innerHTML=`<h2>Resultados</h2><div class="card">${progress()}<p class="muted">Puntuación (últimas respuestas comprobadas)</p><div class="score">${score()}/${totalQuestions}</div><p>${count()===8?'Recorrido completado.':'Puedes continuar en cualquier momento.'}</p></div><div class="card">${items.map(x=>`<div class="zone"><button data-open="${x.id}">${x.roman}. ${esc(x.title)}</button><strong>${answers[x.id]?.graded?.some(Number.isInteger)?points(x)+'/'+x.questions.length:'—'}</strong></div>`).join('')}</div><div class="card"><h3>Reiniciar la actividad</h3><p class="muted">Borra las respuestas de este dispositivo para repetir la actividad.</p><button class="wide" id="reset">Reiniciar actividad</button></div>`}
 function render(){document.querySelector("nav").hidden=tab==="welcome";document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===(tab==='detail'?'list':tab)?'page':'false'));({welcome:renderWelcome,route:renderRoute,list:renderList,detail:renderDetail,results:renderResults}[tab])();if(!storageOK)document.querySelector('#storage-status').textContent='No se pudo acceder al progreso guardado en este dispositivo.'}
 function go(t,id){if(tab==='welcome'&&t!=='welcome'){started=true;save()}if(t==='results'&&watch!==null)stopGPS();tab=t;selected=id||null;render();scrollTo(0,0);main.focus({preventScroll:true})}
 function refreshGPS(){const s=document.querySelector('#gps-status');if(s)s.textContent=gpsMessage;document.querySelectorAll('[data-distance]').forEach(e=>e.textContent=proximity(item(Number(e.dataset.distance))));const m=document.querySelector('#map');if(m)m.innerHTML=map();const b=document.querySelector('#gps');if(b){b.textContent=watch===null?'Activar GPS':'Desactivar GPS';b.setAttribute('aria-pressed',String(watch!==null))}}

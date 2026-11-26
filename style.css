@@ -197,3 +197,9 @@ nav[hidden] { display: none; }
 
   .inscription-display > .photo { margin-bottom: 0; }
 }
+
+.inscription-types { margin: .9rem 0; }
+.inscription-types dl { margin: .55rem 0 0; }
+.inscription-types dl > div + div { margin-top: .65rem; }
+.inscription-types dt { font-weight: 700; }
+.inscription-types dd { margin: .1rem 0 0; color: var(--muted); }
