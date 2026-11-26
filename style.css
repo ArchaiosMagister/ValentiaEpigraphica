@@ -353,3 +353,57 @@ nav button[aria-current=page] {
   .welcome-wordmark { letter-spacing: .04em; }
   .welcome-wordmark span { letter-spacing: .07em; }
 }
+
+
+/* Local open-licensed fonts and catalogue typography. */
+@font-face {
+  font-family: Marcellus;
+  src: url("fonts/marcellus-regular.ttf") format("truetype");
+  font-style: normal; font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("fonts/source-serif-4-regular.woff2") format("woff2");
+  font-style: normal; font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("fonts/source-serif-4-italic.woff2") format("woff2");
+  font-style: italic; font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("fonts/source-serif-4-semibold.woff2") format("woff2");
+  font-style: normal; font-weight: 600; font-display: swap;
+}
+:root {
+  --reading-font: "Source Serif 4", Palatino, "Palatino Linotype", Georgia, serif;
+  --catalogue-font: Marcellus, Palatino, Georgia, serif;
+}
+h2 { font-family: var(--catalogue-font); font-weight: 400; font-size: clamp(1.5rem, 5vw, 1.9rem); }
+h3 { font-family: var(--catalogue-font); font-weight: 400; font-size: 1.3rem; }
+.list-title strong { font-family: var(--catalogue-font); font-weight: 400; font-size: 1.2rem; }
+details p, .question legend, .inscription-types dd, .option span, .feedback { font-family: var(--reading-font); }
+.question legend { font-weight: 600; }
+details summary { font-family: var(--catalogue-font); font-weight: 400; }
+.epigraph { font-family: var(--catalogue-font); font-weight: 400; }
+
+/* Subtle mineral grain, mouldings and incised lettering. Preserve all line breaks. */
+.stone-frame {
+  border-color: var(--stone-edge);
+  box-shadow: inset 0 0 0 1px var(--stone-light), 0 2px 5px #271e171c;
+}
+.stone-frame .epigraph {
+  background-color: var(--stone-surface);
+  background-image: radial-gradient(ellipse at 16% 12%, #ffffff15, transparent 65%), radial-gradient(ellipse at 84% 77%, #674d3010, transparent 65%);
+  text-shadow: 0 1px 0 #ffffff55;
+  box-shadow: inset 0 1px 4px #352c2329, inset 0 -1px 0 var(--stone-light);
+}
+.stone-frame--ara { border-block: 5px double var(--stone-edge); }
+.stone-frame--pedestal { border-block: 4px double var(--stone-edge); }
+.stone-frame--diptych pre + pre { border-inline-start: 3px double var(--stone-edge); }
+:is([data-theme=dark], [data-theme=oled]) .stone-frame .epigraph {
+  text-shadow: 0 1px 0 #0008;
+  background-image: radial-gradient(ellipse at 16% 12%, #ffffff0a, transparent 65%);
+}
+nav svg, .quiet svg { display: block; width: 23px; height: 23px; margin-inline: auto; }
