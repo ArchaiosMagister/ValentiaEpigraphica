@@ -65,3 +65,57 @@ nav[hidden] { display: none; }
 .epigraph.enlarged { font-size: 1.25rem; }
 .quiz-result:empty { margin: 0; }
 .quiz-result:not(:empty) { margin: .75rem 0 0; }
+
+.stone-frame {
+  --stone-edge: #82745e;
+  --stone-rim: #b6a78c;
+  --stone-surface: #eee5d4;
+  --stone-letter: #352c23;
+  margin: .65rem auto 0;
+  max-width: 35rem;
+  padding: .35rem;
+  border: 1px solid var(--stone-edge);
+  border-radius: 3px;
+  background: var(--stone-rim);
+  box-shadow: inset 0 0 0 2px var(--stone-surface);
+}
+.stone-frame--ara { max-width: 20rem; border-block-width: 5px; }
+.stone-frame--marble { max-width: 21rem; --stone-surface: #f0dfd6; --stone-rim: #c6a59a; }
+.stone-frame--tall { max-width: 31rem; }
+.stone-frame--ansata {
+  max-width: 29rem;
+  padding-inline: 1.25rem;
+  clip-path: polygon(5% 0, 95% 0, 95% 35%, 100% 28%, 100% 72%, 95% 65%, 95% 100%, 5% 100%, 5% 65%, 0 72%, 0 28%, 5% 35%);
+}
+:is([data-theme=dark], [data-theme=oled]) .stone-frame {
+  --stone-edge: #9d8d72;
+  --stone-rim: #5d5446;
+  --stone-surface: #2e2a23;
+  --stone-letter: #f6ead1;
+}
+:is([data-theme=dark], [data-theme=oled]) .stone-frame--marble {
+  --stone-surface: #382b28;
+  --stone-rim: #725951;
+}
+.stone-frame .epigraph {
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--stone-edge);
+  border-radius: 1px;
+  background: var(--stone-surface);
+  color: var(--stone-letter);
+  white-space: normal;
+  font-size: clamp(.95rem, 3.8vw, 1.125rem);
+}
+.stone-frame .epigraph.enlarged { font-size: 1.4rem; }
+.inscription-fields { display: flex; width: max-content; min-width: 100%; justify-content: center; }
+.inscription-fields pre {
+  margin: 0;
+  padding: .8rem clamp(.45rem, 2vw, 1rem);
+  font: inherit;
+  font-variant-caps: small-caps;
+  text-transform: lowercase;
+  white-space: pre;
+}
+.stone-frame--diptych pre { flex: 1; text-align: center; }
+.stone-frame--diptych pre + pre { border-inline-start: 3px double var(--stone-edge); }

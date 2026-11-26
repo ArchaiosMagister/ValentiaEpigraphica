@@ -48,7 +48,7 @@ La transcripción didáctica usa mayúsculas y V epigráfica, Æ para AE según 
 | VII–VIII | [Julia Mamea y Probo, César Guardeño Gil y Círculo por la Defensa y Difusión del Patrimonio Cultural](https://conocevalenciapaseando.blogspot.com/2009/11/inscripciones-romanas-basilica-de-la_30.html) | CC BY-NC-SA 3.0 |
 | IV–VIII | [Vista de conjunto, César Guardeño Gil y Círculo por la Defensa y Difusión del Patrimonio Cultural](https://conocevalenciapaseando.blogspot.com/2009/11/inscripciones-romanas-basilica-de-la.html) | CC BY-NC-SA 3.0 |
 
-Las copias se optimizaron para el uso sin conexión. Las fichas IV–VI muestran recortes. Las imágenes mantienen su licencia respectiva. Las de César Guardeño Gil y el Círculo se usan en esta aplicación educativa no comercial. El registro de Wikiloc sirvió para cotejar las piezas. Sus fotografías quedan en el sitio original.
+Los marcos de las transcripciones son recreaciones esquemáticas de los soportes visibles en las fotos. La vista de conjunto permite dar referencias de izquierda a derecha para los seis campos de la Basílica. Las cinco fichas conservan la referencia GPS común. Las copias se optimizaron para el uso sin conexión. Las fichas IV–VI muestran recortes. Las imágenes mantienen su licencia respectiva. Las de César Guardeño Gil y el Círculo se usan en esta aplicación educativa no comercial. El registro de Wikiloc sirvió para cotejar las piezas. Sus fotografías quedan en el sitio original.
 
 Para incorporar otra fotografía, guarda su archivo en `photos/`, añade autoría, licencia, fuente y dimensiones a `photos` dentro de la ficha en `data.js` e incluye el archivo en la lista del service worker.
 

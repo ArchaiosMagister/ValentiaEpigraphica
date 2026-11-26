@@ -86,7 +86,25 @@ function renderRoute() {
     </div>`;
 }
 function renderList(){main.innerHTML=`<h2>Inscripciones</h2><div class="card">${progress()}</div>${items.map(x=>`<button class="list-item" data-open="${x.id}"><span class="number">${x.roman}</span><span class="list-title"><strong>${esc(x.title)}</strong><small>${esc(x.street)} · ${esc(x.date)}</small></span><span class="${complete(x)?'done':'muted'}" aria-label="${complete(x)?'Completada':'Pendiente'}">${complete(x)?'✓':'›'}</span></button>`).join('')}`}
-function renderDetail(){const x=item(selected),a=answers[x.id]||{},draft=a.draft||[],graded=complete(x)&&x.questions.every((q,i)=>draft[i]===a.graded[i]);main.innerHTML=`<button class="back" data-go="list">‹ Todas las inscripciones</button><p class="muted" id="completion-status">${x.roman} · ${complete(x) ? "Actividad completada" : "Actividad pendiente"}</p><h2>${esc(x.title)}</h2><p class="muted">${esc(x.street)} · ${esc(x.date)}</p><div class="card"><div class="row"><strong data-distance="${x.id}">${proximity(x)}</strong><button id="gps">${watch!==null?'Desactivar GPS':'Activar GPS'}</button></div><p id="gps-status" class="muted" role="status">${esc(gpsMessage)}</p><p class="muted">${esc(x.locationHint)}</p><p><a href="${esc(x.streetView)}" target="_blank" rel="noopener noreferrer">Ver la fachada en Street View</a></p>${photos(x)}<div class="transcription"><button id="enlarge-latin" type="button" aria-pressed="false" aria-controls="latin-text">Ampliar texto latino</button><div id="latin-text" class="epigraph" lang="la" tabindex="0" role="region" aria-label="Transcripción latina">${esc(x.latin)}</div></div><details><summary>Traducción</summary><p>${esc(x.translation)}</p></details><details><summary>Contexto histórico</summary><p>${esc(x.context)}</p></details></div><form class="card" id="quiz"><h3>Actividades</h3>${x.questions.map((q,i)=>`<fieldset class="question"><legend>${i+1}. ${esc(q.text)}</legend>${q.options.map((o,j)=>`<label class="option"><input type="radio" name="q${i}" value="${j}" ${draft[i]===j?'checked':''}><span>${esc(o)}</span></label>`).join('')}<p class="feedback" hidden></p></fieldset>`).join('')}<button class="primary wide" id="check" type="submit" ${x.questions.every((q,i)=>Number.isInteger(draft[i]))?'':'disabled'}>Comprobar respuestas</button><p class="done quiz-result" role="status"></p></form><div class="actions">${x.id>1?`<button data-open="${x.id-1}">‹ Anterior</button>`:''}${x.id<8?`<button class="next-inscription" data-open="${x.id+1}">Siguiente inscripción · ${item(x.id+1).roman}</button>`:`<button data-go="results">Ver resultados ›</button>`}</div>`;const form = document.querySelector('#quiz');
+function formatLatinTerms(text) {
+  return text.split('*').map((part, index) =>
+    index % 2 ? `<i lang="la">${esc(part)}</i>` : esc(part)
+  ).join('');
+}
+
+function transcription(item) {
+  const fields = item.latin.split('\n\n');
+  return `<div class="transcription">
+    <button id="enlarge-latin" type="button" aria-pressed="false" aria-controls="latin-text">Ampliar texto latino</button>
+    <div class="stone-frame stone-frame--${esc(item.frame)}">
+      <div id="latin-text" class="epigraph" lang="la" tabindex="0" role="region" aria-label="Transcripción latina">
+        <div class="inscription-fields">${fields.map(field => `<pre>${esc(field)}</pre>`).join('')}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderDetail(){const x=item(selected),a=answers[x.id]||{},draft=a.draft||[],graded=complete(x)&&x.questions.every((q,i)=>draft[i]===a.graded[i]);main.innerHTML=`<button class="back" data-go="list">‹ Todas las inscripciones</button><p class="muted" id="completion-status">${x.roman} · ${complete(x) ? "Actividad completada" : "Actividad pendiente"}</p><h2>${esc(x.title)}</h2><p class="muted">${esc(x.street)} · ${esc(x.date)}</p><div class="card"><div class="row"><strong data-distance="${x.id}">${proximity(x)}</strong><button id="gps">${watch!==null?'Desactivar GPS':'Activar GPS'}</button></div><p id="gps-status" class="muted" role="status">${esc(gpsMessage)}</p><p class="muted">${esc(x.locationHint)}</p><p><a href="${esc(x.streetView)}" target="_blank" rel="noopener noreferrer">Ver la fachada en Street View</a></p>${photos(x)}${transcription(x)}<details><summary>Traducción</summary><p>${esc(x.translation)}</p></details><details><summary>Contexto histórico</summary><p>${esc(x.context)}</p></details></div><form class="card" id="quiz"><h3>Actividades</h3>${x.questions.map((q,i)=>`<fieldset class="question"><legend>${i+1}. ${formatLatinTerms(q.text)}</legend>${q.options.map((o,j)=>`<label class="option"><input type="radio" name="q${i}" value="${j}" ${draft[i]===j?'checked':''}><span>${esc(o)}</span></label>`).join('')}<p class="feedback" hidden></p></fieldset>`).join('')}<button class="primary wide" id="check" type="submit" ${x.questions.every((q,i)=>Number.isInteger(draft[i]))?'':'disabled'}>Comprobar respuestas</button><p class="done quiz-result" role="status"></p></form><div class="actions">${x.id>1?`<button data-open="${x.id-1}">‹ Anterior</button>`:''}${x.id<8?`<button class="next-inscription" data-open="${x.id+1}">Siguiente inscripción · ${item(x.id+1).roman}</button>`:`<button data-go="results">Ver resultados ›</button>`}</div>`;const form = document.querySelector('#quiz');
   const feedback = [...form.querySelectorAll('.feedback')];
   const result = form.querySelector('.quiz-result');
   const check = form.querySelector('#check');
@@ -98,8 +116,8 @@ function renderDetail(){const x=item(selected),a=answers[x.id]||{},draft=a.draft
       const correct = gradedAnswers?.[i] === question.correct;
       message.hidden = !gradedAnswers;
       message.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
-      message.textContent = gradedAnswers
-        ? (correct ? 'Correcto. ' : 'Respuesta incorrecta. ') + question.explanation
+      message.innerHTML = gradedAnswers
+        ? (correct ? 'Correcto. ' : 'Respuesta incorrecta. ') + formatLatinTerms(question.explanation)
         : '';
     }
     result.textContent = gradedAnswers

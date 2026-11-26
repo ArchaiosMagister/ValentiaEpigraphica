@@ -31,6 +31,12 @@ require('../data.js');
       await page.locator('.list-item[data-open="' + item.id + '"]').click();
       assert.equal(await page.locator('h2').textContent(), item.title);
       assert.equal(await page.locator('fieldset').count(), 2);
+      const fields = page.locator('#latin-text pre');
+      assert.deepEqual(await fields.allTextContents(), item.latin.split('\n\n'));
+      assert.equal(await fields.first().evaluate(field => getComputedStyle(field).fontVariantCaps), 'small-caps');
+      if (item.id === 4) {
+        assert.deepEqual(await page.locator('legend i[lang=la]').allTextContents(), ['deo', 'Asclepio']);
+      }
       for (const [i, question] of item.questions.entries()) {
         assert.equal(question.options.length, 3);
         assert.ok(Number.isInteger(question.correct) && question.correct >= 0 && question.correct < 3);
