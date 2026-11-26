@@ -45,6 +45,7 @@ require('../data.js');
         await page.locator('input[name=q' + i + '][value="' + question.correct + '"]').check();
       }
       await page.locator('#check').click();
+      await page.waitForFunction(() => document.querySelectorAll('.feedback.correct:not([hidden])').length === 3);
       assert.equal(await page.locator('.feedback.correct').count(), 3);
       await page.locator('nav [data-tab=list]').click();
     }
@@ -58,13 +59,16 @@ require('../data.js');
     await page.locator('#check').click();
     assert.equal(await page.locator('details[open]').count(), 2);
     assert.equal(await page.locator('#enlarge-latin').getAttribute('aria-pressed'), 'true');
+    await page.waitForFunction(() => document.querySelectorAll('.feedback.incorrect:not([hidden])').length === 1);
     assert.equal(await page.locator('.feedback.incorrect').count(), 1);
     await page.locator('.actions [data-open="2"]').click();
     await page.locator('.actions [data-open="1"]').click();
     assert.equal(await page.locator('.feedback.incorrect').count(), 1);
     await page.locator('#theme').click();
+    await page.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
     assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
     await page.locator('#theme').click();
+    await page.waitForFunction(() => document.documentElement.dataset.theme === 'oled');
     assert.equal(await page.locator('html').getAttribute('data-theme'), 'oled');
 
     await context.setOffline(true);
@@ -102,6 +106,7 @@ require('../data.js');
     assert.equal(await page.locator('.score').textContent(), '23/24');
     page.once('dialog', dialog => dialog.accept());
     await page.locator('#reset').click();
+    await page.getByRole('button', { name: 'Empezar recorrido' }).waitFor();
     await page.reload();
     await page.getByRole('button', { name: 'Empezar recorrido' }).click();
     await page.locator('nav [data-tab=results]').click();
