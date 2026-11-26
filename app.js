@@ -1,5 +1,6 @@
 'use strict';
-const { items } = VE_DATA;
+const { items, recap } = VE_DATA;
+const activities = [...items, recap];
 const main = document.querySelector('#main');
 const key = 'valentia-epigraphica-v1';
 const themes = ['light', 'dark', 'oled'];
@@ -8,7 +9,7 @@ let storageOK = true;
 
 function normalizeAnswers(raw) {
   const valid = {};
-  for (const x of items) {
+  for (const x of activities) {
     const entry = raw?.[x.id];
     if (!entry || typeof entry !== 'object') continue;
     const record = {};
@@ -81,6 +82,9 @@ function storageStatus() {
   document.querySelector('#storage-status').textContent = storageOK
     ? '' : 'No se puede garantizar el guardado. El progreso se conserva mientras esta página permanezca abierta.';
 }
+function recapUnlocked(records = answers) {
+  return items.every(x => x.questions.every((q, i) => Number.isInteger(records[x.id]?.graded?.[i])));
+}
 function adopt(next) {
   const reset = next.generation !== state.generation;
   state = next;
@@ -90,6 +94,8 @@ function adopt(next) {
     stopGPS();
     tab = 'welcome';
     selected = null;
+  } else if (tab === 'recap' && !recapUnlocked()) {
+    tab = 'results';
   } else if (started && tab === 'welcome') {
     tab = 'route';
   }
@@ -97,7 +103,7 @@ function adopt(next) {
 }
 function syncView(reset = false) {
   if (pendingWrites) return;
-  if (!reset && tab === 'detail' && syncDetail) syncDetail();
+  if (!reset && (tab === 'detail' || tab === 'recap') && syncDetail) syncDetail();
   else render();
   storageStatus();
 }
@@ -231,7 +237,7 @@ function renderWelcome() {
     <div class="welcome-cenefa" aria-hidden="true"></div>
     <div class="welcome-body">
       <h2>Ocho inscripciones romanas</h2>
-      <p>Recorre el centro de Valencia, lee cada inscripción en su lugar y responde tres o cuatro preguntas breves.</p>
+      <p>Recorre el centro de Valencia, lee cada inscripción en su lugar y responde tres o cuatro preguntas breves. Al terminar las ocho fichas, podrás realizar una recapitulación final.</p>
       <div class="welcome-facts"><div><strong aria-hidden="true">VIII</strong><span>8 inscripciones</span></div><div><strong aria-hidden="true">IV</strong><span>4 localizaciones</span></div></div>
       <button class="primary wide" data-go="route">Empezar recorrido</button>
       ${inscriptionTypes(true)}
@@ -245,7 +251,7 @@ function renderRoute() {
     <div class="card">${progress()}
       ${next ? `<p class="next-stop"><strong>${next.roman} · ${esc(next.street)}</strong><br>${esc(next.title)}</p>
         <button class="primary wide" data-open="${next.id}">${next.id === 1 ? 'Abrir primera inscripción' : 'Abrir siguiente inscripción'}</button>`
-      : '<p>Recorrido completado.</p><button class="primary wide" data-go="results">Ver resultados</button>'}
+      : '<p>Ocho inscripciones completadas.</p>' + (complete(recap) ? '<button class="primary wide" data-go="results">Ver resultados</button>' : '<button class="primary wide" data-go="recap">Recapitulación final</button>')}
     </div>
     <div class="card">
       ${inscriptionTypes()}
@@ -276,7 +282,34 @@ function transcription(item) {
   </div>`;
 }
 
-function renderDetail(){const x=item(selected);const {closeup,setting}=inscriptionPhotos(x);const a=answers[x.id]||{},draft=a.draft||[],graded=complete(x)&&x.questions.every((q,i)=>draft[i]===a.graded[i]);main.innerHTML=`<button class="back" data-go="list">‹ Todas las inscripciones</button><p class="muted" id="completion-status">${x.roman} · ${complete(x) ? "Actividad completada" : "Actividad pendiente"}</p><h2>${esc(x.title)}</h2><p class="muted">${esc(x.street)} · ${esc(x.date)}</p><div class="card"><div class="row"><strong data-distance="${x.id}">${proximity(x)}</strong><button id="gps" aria-pressed="${watch !== null}">${watch!==null?'Desactivar GPS':'Activar GPS'}</button></div><p id="gps-status" class="muted" role="status">${esc(gpsMessage)}</p><p class="muted">${esc(x.locationHint)}</p><p><a href="${esc(x.streetView)}" target="_blank" rel="noopener noreferrer">Ver la fachada en Street View</a></p><div class="inscription-display inscription-display--${esc(x.frame)}">${closeup}${transcription(x)}</div><details class="inscription-translation"><summary>Traducción</summary><p>${esc(x.translation)}</p></details><details><summary>Contexto histórico</summary><p>${formatLatinTerms(x.context)}</p></details>${setting}</div><form class="card" id="quiz"><h3>Actividades</h3>${x.questions.map((q,i)=>`<fieldset class="question"><legend>${i+1}. ${formatLatinTerms(q.text)}</legend>${q.options.map((o,j)=>`<label class="option"><input type="radio" name="q${i}" value="${j}" ${draft[i]===j?'checked':''}><span>${esc(o)}</span></label>`).join('')}<p class="feedback" hidden></p></fieldset>`).join('')}<button class="primary wide" id="check" type="submit" ${x.questions.every((q,i)=>Number.isInteger(draft[i]))?'':'disabled'}>Comprobar respuestas</button><p class="done quiz-result" role="status"></p></form><div class="actions">${x.id>1?`<button data-open="${x.id-1}">‹ Anterior</button>`:''}${x.id<8?`<button class="next-inscription" data-open="${x.id+1}">Siguiente inscripción · ${item(x.id+1).roman}</button>`:`<button data-go="results">Ver resultados ›</button>`}</div>`;const form = document.querySelector('#quiz');
+function quizMarkup(x) {
+  const draft = answers[x.id]?.draft || [];
+  return `<form class="card" id="quiz"><h3>${x.id === recap.id ? "Preguntas de recapitulación" : "Actividades"}</h3>${x.questions.map((q,i)=>`<fieldset class="question"><legend>${i+1}. ${formatLatinTerms(q.text)}</legend>${q.options.map((o,j)=>`<label class="option"><input type="radio" name="q${i}" value="${j}" ${draft[i]===j?'checked':''}><span>${esc(o)}</span></label>`).join('')}<p class="feedback" hidden></p></fieldset>`).join('')}<button class="primary wide" id="check" type="submit" ${x.questions.every((q,i)=>Number.isInteger(draft[i]))?'':'disabled'}>Comprobar respuestas</button><p class="done quiz-result" role="status"></p></form>`;
+}
+function renderDetail(){const x=item(selected);const {closeup,setting}=inscriptionPhotos(x);main.innerHTML=`<button class="back" data-go="list">‹ Todas las inscripciones</button><p class="muted" id="completion-status">${x.roman} · ${complete(x) ? "Actividad completada" : "Actividad pendiente"}</p><h2>${esc(x.title)}</h2><p class="muted">${esc(x.street)} · ${esc(x.date)}</p><div class="card"><div class="row"><strong data-distance="${x.id}">${proximity(x)}</strong><button id="gps" aria-pressed="${watch !== null}">${watch!==null?'Desactivar GPS':'Activar GPS'}</button></div><p id="gps-status" class="muted" role="status">${esc(gpsMessage)}</p><p class="muted">${esc(x.locationHint)}</p><p><a href="${esc(x.streetView)}" target="_blank" rel="noopener noreferrer">Ver la fachada en Street View</a></p><div class="inscription-display inscription-display--${esc(x.frame)}">${closeup}${transcription(x)}</div><details class="inscription-translation"><summary>Traducción</summary><p>${esc(x.translation)}</p></details><details><summary>Contexto histórico</summary><p>${formatLatinTerms(x.context)}</p></details>${setting}</div>${quizMarkup(x)}<div class="actions">${x.id>1?`<button data-open="${x.id-1}">‹ Anterior</button>`:''}${x.id<8?`<button class="next-inscription" data-open="${x.id+1}">Siguiente inscripción · ${item(x.id+1).roman}</button>`:`<button data-go="results">Ver resultados ›</button>`}</div>`;
+  attachQuiz(x);
+  const enlarge = document.querySelector('#enlarge-latin');
+  const latin = document.querySelector('#latin-text');
+  enlarge.addEventListener('click', () => {
+    const enlarged = latin.classList.toggle('enlarged');
+    enlarge.setAttribute('aria-pressed', String(enlarged));
+    enlarge.textContent = enlarged ? 'Reducir texto latino' : 'Ampliar texto latino';
+  });
+}
+function renderRecap() {
+  if (!recapUnlocked()) { tab = 'results'; render(); return; }
+  main.innerHTML = `<button class="back" data-go="results">‹ Resultados</button>
+    <h2>Recapitulación final</h2>
+    <p class="muted" id="completion-status">Recapitulación · ${complete(recap) ? 'Actividad completada' : 'Actividad pendiente'}</p>
+    <p>Repasa lo aprendido en las ocho inscripciones. Cinco preguntas sobre morfología, sintaxis y lectura epigráfica.</p>
+    ${quizMarkup(recap)}
+    <div class="actions"><button data-go="results">Ver resultados ›</button></div>`;
+  attachQuiz(recap);
+}
+function attachQuiz(x) {
+  const a = answers[x.id] || {}, draft = a.draft || [];
+  const graded = complete(x) && x.questions.every((q,i) => draft[i] === a.graded[i]);
+  const form = document.querySelector('#quiz');
   const feedback = [...form.querySelectorAll('.feedback')];
   const result = form.querySelector('.quiz-result');
   const check = form.querySelector('#check');
@@ -304,8 +337,12 @@ function renderDetail(){const x=item(selected);const {closeup,setting}=inscripti
       return input ? Number(input.value) : null;
     });
   }
+  let renderedRecord = JSON.stringify(a);
   syncDetail = () => {
     const current = answers[x.id] || {};
+    const fingerprint = JSON.stringify(current);
+    if (fingerprint === renderedRecord) return;
+    renderedRecord = fingerprint;
     const values = current.draft || [];
     for (const input of form.querySelectorAll('input[type=radio]')) {
       input.checked = values[Number(input.name.slice(1))] === Number(input.value);
@@ -324,6 +361,7 @@ function renderDetail(){const x=item(selected);const {closeup,setting}=inscripti
     check.disabled = !visibleAnswers().every(Number.isInteger);
     showFeedback(null);
     void persist('answer', next => {
+      if (x.id === recap.id && !recapUnlocked(next.answers)) return;
       const record = answerRecord(next, x);
       (record.draft ||= Array(x.questions.length).fill(null))[i] = value;
       next.started = true;
@@ -335,6 +373,7 @@ function renderDetail(){const x=item(selected);const {closeup,setting}=inscripti
     if (!values.every((value, i) => Number.isInteger(value) && value >= 0 && value < x.questions[i].options.length)) return;
     // Grade precisely the choices the pupil saw on submitting.
     void persist('answer', next => {
+      if (x.id === recap.id && !recapUnlocked(next.answers)) return;
       const record = answerRecord(next, x);
       record.draft = values.slice();
       record.graded = values.slice();
@@ -342,17 +381,19 @@ function renderDetail(){const x=item(selected);const {closeup,setting}=inscripti
     });
   });
 
-  const enlarge = document.querySelector('#enlarge-latin');
-  const latin = document.querySelector('#latin-text');
-  enlarge.addEventListener('click', () => {
-    const enlarged = latin.classList.toggle('enlarged');
-    enlarge.setAttribute('aria-pressed', String(enlarged));
-    enlarge.textContent = enlarged ? 'Reducir texto latino' : 'Ampliar texto latino';
-  });
 }
-function renderResults(){main.innerHTML=`<h2>Resultados</h2><div class="card">${progress()}<p class="muted">Puntuación (últimas respuestas comprobadas)</p><div class="score">${score()}/${totalQuestions}</div><p>${count()===8?'Recorrido completado.':'Puedes continuar en cualquier momento.'}</p></div><div class="card">${items.map(x=>`<div class="zone"><button data-open="${x.id}">${x.roman}. ${esc(x.title)}</button><strong>${answers[x.id]?.graded?.some(Number.isInteger)?points(x)+'/'+x.questions.length:'—'}</strong></div>`).join('')}</div><div class="card"><h3>Reiniciar la actividad</h3><p class="muted">Borra las respuestas de este dispositivo para repetir la actividad.</p><button class="wide" id="reset">Reiniciar actividad</button></div>`}
-function render(){syncDetail=null;document.querySelector("nav").hidden=tab==="welcome";document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===(tab==='detail'?'list':tab)?'page':'false'));({welcome:renderWelcome,route:renderRoute,list:renderList,detail:renderDetail,results:renderResults}[tab])();if(!storageOK)document.querySelector('#storage-status').textContent='No se pudo acceder al progreso guardado en este dispositivo.'}
+function recapCard() {
+  const unlocked = recapUnlocked();
+  return `<div class="card" id="recap-card"><h3>Recapitulación final</h3>
+    ${unlocked ? `<p>${complete(recap) ? 'Recapitulación completada.' : 'Cinco preguntas filológicas para terminar la actividad.'}</p>
+      <p class="muted">Puntuación de recapitulación: <strong id="recap-score">${points(recap)}/${recap.questions.length}</strong></p>
+      <button class="primary wide" data-go="recap">${complete(recap) ? 'Revisar recapitulación' : 'Hacer recapitulación'}</button>`
+      : '<p class="muted">Se desbloquea al completar las ocho inscripciones.</p>'}</div>`;
+}
+function renderResults(){main.innerHTML=`<h2>Resultados</h2><div class="card">${progress()}<p class="muted">Puntuación (últimas respuestas comprobadas)</p><div class="score">${score()}/${totalQuestions}</div><p>${count()===8?'Ocho inscripciones completadas.':'Puedes continuar en cualquier momento.'}</p></div>${recapCard()}<div class="card">${items.map(x=>`<div class="zone"><button data-open="${x.id}">${x.roman}. ${esc(x.title)}</button><strong>${answers[x.id]?.graded?.some(Number.isInteger)?points(x)+'/'+x.questions.length:'—'}</strong></div>`).join('')}</div><div class="card"><h3>Reiniciar la actividad</h3><p class="muted">Borra las respuestas de este dispositivo para repetir la actividad.</p><button class="wide" id="reset">Reiniciar actividad</button></div>`}
+function render(){syncDetail=null;document.querySelector("nav").hidden=tab==="welcome";document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===(tab==='detail'?'list':tab==='recap'?'results':tab)?'page':'false'));({welcome:renderWelcome,route:renderRoute,list:renderList,detail:renderDetail,recap:renderRecap,results:renderResults}[tab])();if(!storageOK)document.querySelector('#storage-status').textContent='No se pudo acceder al progreso guardado en este dispositivo.'}
 async function go(t, id) {
+  if (t === 'recap' && !recapUnlocked()) return;
   if (tab === 'welcome' && t !== 'welcome') {
     if (await persist('start', next => { next.started = true; })) return;
   }

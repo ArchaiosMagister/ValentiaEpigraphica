@@ -555,5 +555,62 @@ globalThis.VE_DATA = {
       ],
       "frame": "tall"
     }
-  ]
+  ],
+  "recap": {
+    "id": "recap",
+    "roman": "Recapitulación",
+    "title": "Recapitulación final",
+    "questions": [
+      {
+        "text": "En las inscripciones I y II, ¿en qué caso aparecen los nombres de quienes dedican los monumentos (*Caius Riccius Atimetus*, *Lucius Rubrius Eutyches*)?",
+        "options": [
+          "Dativo",
+          "Nominativo",
+          "Genitivo"
+        ],
+        "correct": 1,
+        "explanation": "Los dedicantes aparecen en nominativo: son el sujeto de un verbo de dedicación que suele quedar sobreentendido."
+      },
+      {
+        "text": "En las dedicatorias a *Quinto Iunio Crati*, *Asclepio deo* y *Sertoriæ Maximæ*, ¿qué caso identifica a la persona o divinidad homenajeada?",
+        "options": [
+          "Genitivo",
+          "Acusativo",
+          "Dativo"
+        ],
+        "correct": 2,
+        "explanation": "El dativo expresa el destinatario de la dedicatoria, aunque el verbo no aparezca escrito."
+      },
+      {
+        "text": "¿Cómo se desarrollan las abreviaturas *Q.* en *Q. Iunio Crati* y *M.* en *M. Antonius Avitus*, teniendo en cuenta sus respectivos casos?",
+        "options": [
+          "Quinto y Marcus",
+          "Quintus y Marco",
+          "Quinti y Marci"
+        ],
+        "correct": 0,
+        "explanation": "*Q.* representa *Quinto* (dativo) y *M.* representa *Marcus* (nominativo). El contexto determina el caso del nombre abreviado."
+      },
+      {
+        "text": "En *Sertoriæ Q. f. Maximæ*, ¿qué desarrollo corresponde a *Q. f.*?",
+        "options": [
+          "Quintus filius",
+          "Quinto filio",
+          "Quinti filiæ"
+        ],
+        "correct": 2,
+        "explanation": "*Quinti* es genitivo de filiación («de Quinto»); *filiæ* está en dativo, como *Sertoriæ Maximæ* («a Sertoria Máxima, hija de Quinto»)."
+      },
+      {
+        "text": "En la transcripción de Julia Mamea aparecen dobles corchetes, como *[[IVLIÆ]]*. ¿Qué indican en la edición de esta inscripción?",
+        "options": [
+          "Letras borradas intencionadamente en el monumento",
+          "Abreviaturas de los nombres propios",
+          "Letras añadidas por el editor para desarrollar una abreviatura"
+        ],
+        "correct": 0,
+        "explanation": "Los dobles corchetes señalan un texto borrado en el soporte. Los paréntesis, en cambio, se usan para desarrollar abreviaturas."
+      }
+    ]
+  }
 };

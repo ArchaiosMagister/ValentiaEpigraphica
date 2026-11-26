@@ -51,6 +51,16 @@ require('../data.js');
     }
     await page.locator('nav [data-tab=results]').click();
     assert.equal(await page.locator('.score').textContent(), '26/26');
+    await page.getByRole('button', {name:'Hacer recapitulación'}).click();
+    assert.equal(await page.locator('fieldset').count(), 5);
+    for (const [i,q] of globalThis.VE_DATA.recap.questions.entries()) {
+      await page.locator('input[name=q'+i+'][value="'+q.correct+'"]').check();
+    }
+    await page.locator('#check').click();
+    await page.waitForFunction(() => document.querySelectorAll('.feedback.correct:not([hidden])').length === 5);
+    await page.locator('nav [data-tab=results]').click();
+    assert.equal(await page.locator('#recap-score').textContent(),'5/5');
+    assert.equal(await page.locator('.score').textContent(),'26/26');
     await page.locator('main [data-open="1"]').click();
     await page.locator('input[name=q0][value="0"]').check();
     await page.getByText('Traducción', { exact: true }).click();
@@ -101,6 +111,10 @@ require('../data.js');
     }
     await page.locator('nav [data-tab=results]').click();
     assert.equal(await page.locator('.score').textContent(), '25/26');
+    assert.equal(await page.locator('#recap-score').textContent(),'5/5');
+    await page.getByRole('button',{name:'Revisar recapitulación'}).click();
+    assert.equal(await page.locator('input:checked').count(),5);
+    await page.locator('nav [data-tab=results]').click();
     page.once('dialog', dialog => dialog.dismiss());
     await page.locator('#reset').click();
     assert.equal(await page.locator('.score').textContent(), '25/26');
@@ -111,6 +125,8 @@ require('../data.js');
     await page.getByRole('button', { name: 'Empezar recorrido' }).click();
     await page.locator('nav [data-tab=results]').click();
     assert.equal(await page.locator('.score').textContent(), '0/26');
+    assert.equal(await page.locator('[data-go=recap]').count(),0);
+    assert.equal(await page.locator('#recap-score').count(),0);
     await page.evaluate(() => localStorage.setItem('valentia-epigraphica-v1', JSON.stringify({
       answers: { 1: { draft: [1, 0], graded: [1, 0] } },
       theme: 'light',

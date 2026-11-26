@@ -78,3 +78,7 @@ Cinzel, de Natanael Gama, se sirve localmente en los títulos de marca y los num
 ### Revisión de actividades
 
 La pregunta IV.1 se refiere a la función de todo el sintagma dativo *Asclepio deo*, no a la relación interna entre sus dos constituyentes. Se incorporan dos preguntas de selección múltiple adaptadas de `ACTIVIDAD INSCRIPCIONES.pdf` (prueba 1, pregunta 2; prueba 4, pregunta 2). En la primera se distingue *nomen* de *praenomen* y se evita presentar el origen servil como un hecho probado. Hay 26 preguntas en ocho fichas (cuatro en I y IV; tres en las restantes).
+
+### Recapitulación final
+
+Al comprobar todas las preguntas de las ocho inscripciones se desbloquean cinco preguntas de recapitulación filológica. Se guardan con la misma persistencia y autocorrección que las fichas, pero su puntuación (sobre 5) se muestra separada de la del recorrido (sobre 26). El reinicio borra ambas. No se requiere acertar todas las preguntas del recorrido para acceder.
