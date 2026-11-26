@@ -68,3 +68,9 @@ Los enlaces externos son opcionales y no reciben la posición medida por la apli
 ## Tipografía
 
 Cinzel, de Natanael Gama, se sirve localmente en los títulos de marca y los numerales del listado. Consulta la [licencia SIL Open Font License 1.1](fonts/OFL-Cinzel.txt).
+
+### Identidad tipográfica pompeyana
+
+- Marcellus, del [repositorio Google Fonts](https://github.com/google/fonts/tree/main/ofl/marcellus), bajo SIL Open Font License 1.1; licencia local en `fonts/OFL-Marcellus.txt`.
+- Source Serif 4, de Adobe, variantes Regular, Italic y Semibold de la [rama release oficial](https://github.com/adobe-fonts/source-serif/tree/release/WOFF2/OTF), bajo SIL Open Font License 1.1; licencia local en `fonts/OFL-SourceSerif4.txt`.
+- Fuentes originales sin modificaciones y servidas localmente. Los caracteres no cubiertos usan familias de reserva. Cinzel se mantiene en la marca y numerales.

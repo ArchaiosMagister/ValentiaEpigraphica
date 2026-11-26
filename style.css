@@ -1,17 +1,22 @@
-:root{color-scheme:light;--bg:#f6f4ed;--paper:#fffefa;--ink:#202b23;--muted:#526057;--line:#d9ded4;--green:#294735;--gold:#d7c291;--stone:#eee7d8;--good:#22613c;--bad:#a33b26;--shadow:0 4px 16px #18271a0b}*{box-sizing:border-box}html[data-theme=dark]{color-scheme:dark;--bg:#141b16;--paper:#1e2921;--ink:#f0f2e9;--muted:#b7c4b8;--line:#39483d;--green:#c3ddc2;--gold:#d7c291;--stone:#30382d;--good:#a1e0ab;--bad:#ffb39e;--shadow:none}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,sans-serif;padding-bottom:calc(82px + env(safe-area-inset-bottom));}header{background:#26392d;color:#f8f3e4;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top)) max(16px,calc((100vw - 740px)/2)) 13px;}.brand{display:flex;align-items:center;gap:12px}.seal{font:600 19px Georgia,serif;color:#e6ce98;border:1px solid #bca87b;border-radius:50%;width:44px;height:44px;display:grid;place-items:center;flex-shrink:0}h1{font:600 clamp(21px,5vw,29px)/1.1 Georgia,serif;margin:0}header p{font-size:12px;margin:4px 0 0;color:#e2e7dc}main{max-width:740px;padding:18px 16px;margin:auto}h2{font:600 27px/1.18 Georgia,serif;margin:0 0 8px}h3{font-size:17px;margin:0 0 8px}p{margin:0 0 12px}button{font:inherit;cursor:pointer;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:9px 13px}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #bc8c32;outline-offset:3px}button:disabled{opacity:.55;cursor:default}.quiet{background:transparent;color:inherit;border-color:#788979;font-size:20px;min-width:44px}.primary{background:var(--green);color:var(--paper);font-weight:700;border-color:transparent}.wide{width:100%}.card{border:1px solid var(--line);background:var(--paper);border-radius:15px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}.muted,small{color:var(--muted);font-size:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.stack{display:grid;gap:9px}.progress{height:8px;border-radius:8px;background:var(--line);overflow:hidden;margin:10px 0}.progress>span{display:block;background:var(--green);height:100%}.list-item{display:flex;width:100%;text-align:left;gap:12px;align-items:center;margin-bottom:9px;padding:13px}.number{display:grid;place-items:center;width:42px;height:42px;flex-shrink:0;background:var(--stone);color:var(--ink);border-radius:9px;font:600 17px Georgia,serif}.list-title{flex:1;line-height:1.3}.list-title small{display:block;margin-top:5px}.done{color:var(--good);font-weight:700}.epigraph{background:var(--stone);padding:19px 8px;border-radius:10px;text-align:center;font:600 clamp(12px,3.35vw,17px)/1.65 Georgia,serif;white-space:pre-wrap;overflow-wrap:anywhere;letter-spacing:.025em;margin:12px 0 16px}.question{border:0;padding:0;margin:0 0 20px;min-width:0}.question legend{font-weight:650;margin-bottom:9px}.option{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:10px;margin:7px 0;min-height:46px}.option:has(input:checked){border:2px solid var(--green);padding:9px;background:var(--stone)}input[type=radio]{accent-color:var(--green);width:19px;height:19px;flex-shrink:0}.feedback{font-size:14px;padding:8px 10px;border-left:3px solid var(--line);margin:8px 0}.correct{border-color:var(--good);color:var(--good)}.incorrect{border-color:var(--bad);color:var(--bad)}details{border-top:1px solid var(--line);padding:12px 0}summary{cursor:pointer;font-weight:650;padding:4px 0}details p{white-space:pre-line;margin-top:10px}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions>*{flex:1}.map{width:100%;height:auto;max-height:410px;background:var(--stone);border-radius:12px}.map .trail{stroke:var(--green);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.map .dot{fill:var(--green);stroke:var(--paper);stroke-width:2}.map text{fill:var(--paper);font:bold 12px system-ui}.map .user{fill:#237ed6;stroke:white;stroke-width:2}.map .accuracy{fill:#237ed6;fill-opacity:.15;stroke:#237ed6;stroke-opacity:.5}.zone{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.zone:last-child{border:0}.zone button{text-align:left}.pill{font-size:13px;font-weight:650;color:var(--good)}nav{position:fixed;bottom:0;left:0;right:0;z-index:5;display:flex;justify-content:center;background:var(--paper);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom));gap:6px}nav button{border:0;flex:1;max-width:240px;font-size:12px;display:grid;justify-items:center;padding:4px;gap:1px;color:var(--muted)}nav button span{font-size:22px;line-height:1.2}nav button[aria-current=page]{color:var(--green);background:var(--stone);font-weight:700}.score{font:600 45px Georgia,serif;color:var(--green);margin:5px 0}.note{font-size:13px;padding:10px;border:1px dashed var(--line);border-radius:9px}.back{margin-bottom:14px}.hidden{display:none}.warning{color:var(--bad)}@media(min-width:650px){main{padding-top:26px}.card{padding:22px}}@media print{header,nav,button{display:none}body{padding:0}.card{break-inside:avoid}}
+:root{color-scheme:light;--bg:#f2ebdd;--paper:#fcf9f1;--ink:#29251f;--muted:#665b4d;--line:#cbbda5;--accent:#792f28;--accent-ink:#fff7e6;--green:#792f28;--gold:#947443;--stone:#e9dfca;--good:#34583a;--bad:#9c3025;--shadow:none;--bronze:#806133;--ornament:#d8bf92;--heading-font:Cinzel,Georgia,serif;--reading-font:Palatino,"Palatino Linotype",Georgia,serif}*{box-sizing:border-box}html[data-theme=dark]{color-scheme:dark;--bg:#211b18;--paper:#312723;--ink:#f3ecdf;--muted:#d0c1ad;--line:#76644e;--accent:#c77b65;--accent-ink:#201611;--green:#e4a18b;--gold:#d7b87e;--stone:#40342c;--good:#a1d6a3;--bad:#ffb39e;--shadow:none;--bronze:#e0bc83;--ornament:#d8bf92}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,sans-serif;padding-bottom:calc(82px + env(safe-area-inset-bottom));}header{background:#792f28;color:#fff7e6;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top)) max(16px,calc((100vw - 740px)/2)) 13px;}.brand{display:flex;align-items:center;gap:12px}.seal{font:600 19px Georgia,serif;color:#e6ce98;border:1px solid #bca87b;border-radius:50%;width:44px;height:44px;display:grid;place-items:center;flex-shrink:0}h1{font:600 clamp(21px,5vw,29px)/1.1 Georgia,serif;margin:0}header p{font-size:12px;margin:4px 0 0;color:#f0dbc4}main{max-width:740px;padding:18px 16px;margin:auto}h2{font:600 27px/1.18 Georgia,serif;margin:0 0 8px}h3{font-size:17px;margin:0 0 8px}p{margin:0 0 12px}button{font:inherit;cursor:pointer;min-height:44px;border-radius:5px;border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:9px 13px}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #bc8c32;outline-offset:3px}button:disabled{opacity:.55;cursor:default}.quiet{background:transparent;color:inherit;border-color:#d8bf92;font-size:20px;min-width:44px}.primary{background:var(--accent);color:var(--accent-ink);font-weight:700;border-color:transparent}.wide{width:100%}.card{border:1px solid var(--line);background:var(--paper);border-radius:5px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}.muted,small{color:var(--muted);font-size:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.stack{display:grid;gap:9px}.progress{height:8px;border-radius:8px;background:var(--line);overflow:hidden;margin:10px 0}.progress>span{display:block;background:var(--good);height:100%}.list-item{display:flex;width:100%;text-align:left;gap:12px;align-items:center;margin-bottom:9px;padding:13px}.number{display:grid;place-items:center;width:42px;height:42px;flex-shrink:0;background:var(--stone);color:var(--ink);border-radius:9px;font:600 17px Georgia,serif}.list-title{flex:1;line-height:1.3}.list-title small{display:block;margin-top:5px}.done{color:var(--good);font-weight:700}.epigraph{background:var(--stone);padding:19px 8px;border-radius:10px;text-align:center;font:600 clamp(12px,3.35vw,17px)/1.65 Georgia,serif;white-space:pre-wrap;overflow-wrap:anywhere;letter-spacing:.025em;margin:12px 0 16px}.question{border:0;padding:0;margin:0 0 20px;min-width:0}.question legend{font-weight:650;margin-bottom:9px}.option{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:10px;margin:7px 0;min-height:46px}.option:has(input:checked){border:2px solid var(--green);padding:9px;background:var(--stone)}input[type=radio]{accent-color:var(--green);width:19px;height:19px;flex-shrink:0}.feedback{font-size:14px;padding:8px 10px;border-left:3px solid var(--line);margin:8px 0}.correct{border-color:var(--good);color:var(--good)}.incorrect{border-color:var(--bad);color:var(--bad)}details{border-top:1px solid var(--line);padding:12px 0}summary{cursor:pointer;font-weight:650;padding:4px 0}details p{white-space:pre-line;margin-top:10px}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions>*{flex:1}.map{width:100%;height:auto;max-height:410px;background:var(--stone);border-radius:12px}.map .trail{stroke:var(--green);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.map .dot{fill:var(--green);stroke:var(--paper);stroke-width:2}.map text{fill:var(--paper);font:bold 12px system-ui}.map .user{fill:#237ed6;stroke:white;stroke-width:2}.map .accuracy{fill:#237ed6;fill-opacity:.15;stroke:#237ed6;stroke-opacity:.5}.zone{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.zone:last-child{border:0}.zone button{text-align:left}.pill{font-size:13px;font-weight:650;color:var(--good)}nav{position:fixed;bottom:0;left:0;right:0;z-index:5;display:flex;justify-content:center;background:var(--paper);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom));gap:6px}nav button{border:0;flex:1;max-width:240px;font-size:12px;display:grid;justify-items:center;padding:4px;gap:1px;color:var(--muted)}nav button span{font-size:22px;line-height:1.2}nav button[aria-current=page]{color:var(--green);background:var(--stone);font-weight:700}.score{font:600 45px Georgia,serif;color:var(--green);margin:5px 0}.note{font-size:13px;padding:10px;border:1px dashed var(--line);border-radius:9px}.back{margin-bottom:14px}.hidden{display:none}.warning{color:var(--bad)}@media(min-width:650px){main{padding-top:26px}.card{padding:22px}}@media print{header,nav,button{display:none}body{padding:0}.card{break-inside:avoid}}
 
-html[data-theme=oled] {
-  color-scheme: dark;
-  --bg: #000;
-  --paper: #101613;
-  --ink: #faf8ed;
-  --muted: #c6cfc7;
-  --line: #515d53;
-  --green: #c3ddc2;
-  --stone: #202722;
-  --good: #a1e0ab;
-  --bad: #ffb39e;
-  --shadow: none;
+html[data-theme=oled]{
+  color-scheme:dark;
+  --bg:#000;
+  --paper:#121212;
+  --ink:#faf5e9;
+  --muted:#c9bda9;
+  --line:#726454;
+  --accent:#c77b65;
+  --accent-ink:#201611;
+  --green:#e4a18b;
+  --gold:#d7b87e;
+  --stone:#211c18;
+  --good:#a1d6a3;
+  --bad:#ffb39e;
+  --shadow:none;
+  --bronze:#e0bc83;
+  --ornament:#d8bf92;
 }
 .status {
   max-width: 740px;
@@ -203,3 +208,227 @@ nav[hidden] { display: none; }
 .inscription-types dl > div + div { margin-top: .65rem; }
 .inscription-types dt { font-weight: 700; }
 .inscription-types dd { margin: .1rem 0 0; color: var(--muted); }
+
+
+/* Pompeian identity — restrained museum catalogue, high daylight contrast. */
+header {
+  border-bottom: 3px double #d8bf92;
+  position: relative;
+}
+header::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -5px;
+  height: 2px;
+  background: var(--bronze);
+  pointer-events: none;
+}
+.brand h1 { letter-spacing: .045em; line-height: 1.15; }
+.seal {
+  color: #f5dfac;
+  border: 3px double #d8bf92;
+  border-radius: 50%;
+}
+h2 {
+  font-family: var(--heading-font);
+  font-weight: 600;
+  font-size: clamp(1.25rem, 4.7vw, 1.65rem);
+  letter-spacing: .015em;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+h3 {
+  font-family: var(--reading-font);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.card, .list-item { box-shadow: none; border-radius: 5px; }
+.list-item { border-left: 3px solid var(--bronze); }
+.list-title strong {
+  font-family: var(--reading-font);
+  font-size: 1.12rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.number {
+  background: transparent;
+  border-radius: 0;
+  border-right: 1px solid var(--line);
+  color: var(--bronze);
+  width: 46px;
+  padding-right: 8px;
+}
+.option { border-radius: 4px; }
+.option:has(input:checked) { border-color: var(--accent); }
+input[type=radio] { accent-color: var(--accent); }
+details p, .question legend, .inscription-types dd {
+  font-family: var(--reading-font);
+  font-size: 1.06rem;
+  line-height: 1.6;
+}
+details summary {
+  font-family: var(--reading-font);
+  font-size: 1.1rem;
+}
+.epigraph {
+  font-family: var(--reading-font);
+  letter-spacing: .045em;
+}
+nav {
+  border-top: 3px double var(--bronze);
+}
+nav button[aria-current=page] {
+  color: var(--green);
+  border-radius: 4px;
+  box-shadow: inset 0 2px var(--accent);
+}
+.score { font-family: var(--heading-font); color: var(--green); }
+.map .trail { stroke: var(--accent); }
+.map .dot { fill: var(--accent); stroke: var(--paper); }
+.map .dot + text { fill: var(--accent-ink); }
+.welcome {
+  padding: 0;
+  overflow: hidden;
+  margin-top: clamp(.8rem, 3vh, 2rem);
+  border: 1px solid var(--bronze);
+}
+.welcome-monument {
+  background: #792f28;
+  color: #fff7e6;
+  text-align: center;
+  padding: clamp(1.2rem, 5vw, 2.2rem) clamp(.7rem, 3vw, 1.5rem);
+}
+.welcome-monument-inner {
+  border: 3px double #d8bf92;
+  padding: 1rem .45rem;
+}
+.welcome-emblem {
+  display: block;
+  width: 76px;
+  height: 59px;
+  margin: 0 auto .7rem;
+  color: #d8bf92;
+}
+.welcome-wordmark {
+  font-family: var(--heading-font);
+  font-weight: 600;
+  font-size: clamp(1.3rem, 6.5vw, 2.15rem);
+  letter-spacing: .08em;
+  line-height: 1.25;
+}
+.welcome-wordmark span {
+  display: block;
+  font-size: .77em;
+  letter-spacing: .12em;
+}
+.welcome-cenefa {
+  height: 9px;
+  background-color: #947443;
+  background-image: linear-gradient(135deg, transparent 25%, #f2ebdd 25% 50%, transparent 50% 75%, #f2ebdd 75%);
+  background-size: 16px 16px;
+  border-block: 1px solid #d8bf92;
+}
+.welcome-body { padding: clamp(1rem, 4vw, 1.65rem); }
+.welcome-body h2 { text-align: center; }
+.welcome-body > p { margin: .75rem auto 1rem; text-align: center; }
+.welcome-facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 1rem 0 1.25rem;
+  border-block: 1px solid var(--line);
+  padding: .6rem 0;
+}
+.welcome-facts div { text-align: center; }
+.welcome-facts div + div { border-left: 1px solid var(--line); }
+.welcome-facts strong {
+  display: block;
+  font: 600 1.6rem/1.3 var(--heading-font);
+  color: var(--bronze);
+}
+.welcome-facts span { color: var(--muted); font-size: .85rem; }
+:is([data-theme=dark], [data-theme=oled]) .welcome-monument { background: #792f28; }
+@media (max-width:360px) {
+  .brand h1 { letter-spacing: .015em; }
+  .seal { width: 38px; height: 38px; }
+  .welcome-wordmark { letter-spacing: .04em; }
+  .welcome-wordmark span { letter-spacing: .07em; }
+}
+
+
+/* Local open-licensed fonts and catalogue typography. */
+@font-face {
+  font-family: Marcellus;
+  src: url("fonts/marcellus-regular.ttf") format("truetype");
+  font-style: normal; font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("fonts/source-serif-4-regular.woff2") format("woff2");
+  font-style: normal; font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("fonts/source-serif-4-italic.woff2") format("woff2");
+  font-style: italic; font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("fonts/source-serif-4-semibold.woff2") format("woff2");
+  font-style: normal; font-weight: 600; font-display: swap;
+}
+:root {
+  --reading-font: "Source Serif 4", Palatino, "Palatino Linotype", Georgia, serif;
+  --catalogue-font: Marcellus, Palatino, Georgia, serif;
+}
+h2 { font-family: var(--catalogue-font); font-weight: 400; font-size: clamp(1.5rem, 5vw, 1.9rem); }
+h3 { font-family: var(--catalogue-font); font-weight: 400; font-size: 1.3rem; }
+.list-title strong { font-family: var(--catalogue-font); font-weight: 400; font-size: 1.2rem; }
+details p, .question legend, .inscription-types dd, .option span, .feedback { font-family: var(--reading-font); }
+.question legend { font-weight: 600; }
+details summary { font-family: var(--catalogue-font); font-weight: 400; }
+.epigraph { font-family: var(--catalogue-font); font-weight: 400; }
+
+/* Subtle mineral grain, mouldings and incised lettering. Preserve all line breaks. */
+.stone-frame {
+  border-color: var(--stone-edge);
+  box-shadow: inset 0 0 0 1px var(--stone-light), 0 2px 5px #271e171c;
+}
+.stone-frame .epigraph {
+  background-color: var(--stone-surface);
+  background-image: radial-gradient(ellipse at 16% 12%, #ffffff15, transparent 65%), radial-gradient(ellipse at 84% 77%, #674d3010, transparent 65%);
+  text-shadow: 0 1px 0 #ffffff55;
+  box-shadow: inset 0 1px 4px #352c2329, inset 0 -1px 0 var(--stone-light);
+}
+.stone-frame--ara { border-block: 5px double var(--stone-edge); }
+.stone-frame--pedestal { border-block: 4px double var(--stone-edge); }
+.stone-frame--diptych pre + pre { border-inline-start: 3px double var(--stone-edge); }
+:is([data-theme=dark], [data-theme=oled]) .stone-frame .epigraph {
+  text-shadow: 0 1px 0 #0008;
+  background-image: radial-gradient(ellipse at 16% 12%, #ffffff0a, transparent 65%);
+}
+nav svg, .quiet svg { display: block; width: 23px; height: 23px; margin-inline: auto; }
+
+
+/* Small-screen and outdoor legibility refinements. */
+.brand { flex: 1; min-width: 0; }
+.brand > div, .list-title, .option span { min-width: 0; }
+.brand h1 { overflow-wrap: break-word; }
+.quiet { flex-shrink: 0; }
+.zone { grid-template-columns: minmax(0, 1fr) auto; }
+.zone button { min-width: 0; }
+.option span { overflow-wrap: break-word; font-size: 1.03rem; line-height: 1.45; }
+.stone-frame .epigraph { font-size: clamp(1rem, 3.8vw, 1.125rem); }
+.stone-frame .epigraph.enlarged { font-size: 1.4rem; }
+.epigraph { max-width: 100%; overscroll-behavior-inline: contain; }
+nav button { min-width: 0; min-height: 48px; }
+@media (max-width: 360px) {
+  .welcome-monument { padding: .8rem .6rem; }
+  .welcome-monument-inner { padding: .75rem .35rem; }
+  .welcome-emblem { width: 62px; height: 47px; }
+  .welcome-facts { margin-block: .7rem; }
+  .zone { grid-template-columns: 1fr; gap: .35rem; }
+}
+@media (forced-colors: active) {
+  .welcome-cenefa { display: none; }
+  .option:has(input:checked), nav button[aria-current=page] { outline: 2px solid Highlight; }
+}
