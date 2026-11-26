@@ -6,7 +6,7 @@ globalThis.VE_DATA = {
       "title": "Inscripción honorífica a Quinto Junio Crates",
       "street": "C/ Vidal",
       "date": "Segunda mitad del siglo I d. C.",
-      "latin": "Q(VINTO) IVNIO\nCRATI, C(AIVS)\nRICCIVS\nATIMETVS\nET RICCIA NYM–\nPHE AMICO",
+      "latin": "Q(VINTO) IVNIO\nCRATI C(AIVS)\nRICCIVS\nATIMETVS\nET RICCIA NYM–\nPHE AMICO",
       "translation": "A Quinto Junio Crates, Gayo Ricio Atimeto y Ricia Ninfe, a su amigo.",
       "context": "Los dedicantes presentan cognomina griegos y comparten el nomen Riccius/Riccia, indicios de un posible origen servil y de un antiguo patrono común. El cognomen griego de Crates permite plantear, no asegurar, que también fuera liberto.",
       "questions": [
@@ -31,9 +31,23 @@ globalThis.VE_DATA = {
           "explanation": "La manumisión es el acto por el que un esclavo obtiene la libertad."
         }
       ],
-      "lat": 39.473185,
-      "lon": -0.374407,
-      "zone": 1
+      "lat": 39.4732235,
+      "lon": -0.3744353,
+      "zone": 1,
+      "photos": [
+        {
+          "src": "photos/crates.jpg",
+          "alt": "Inscripción de Quinto Junio Crates en la calle Vidal",
+          "width": 1152,
+          "height": 1400,
+          "author": "Joanbanjo",
+          "source": "https://commons.wikimedia.org/wiki/File:Inscripció_romana_al_carrer_de_Vidal_de_València.JPG",
+          "license": "CC BY-SA 3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/"
+        }
+      ],
+      "locationHint": "En la fachada de la calle Vidal, en la esquina del edificio de Banca March.",
+      "streetView": "https://maps.app.goo.gl/mZMrWqVapPmpvKMf8"
     },
     {
       "id": 2,
@@ -43,7 +57,7 @@ globalThis.VE_DATA = {
       "date": "Segunda mitad del siglo I d. C.",
       "latin": "L(UCIO) SCRIBONIO\nEUPHEMO\nSEVIRO AVG(VSTALI)\nL(VCIVS) RVBRIVS\nEVTYCHES\nAMICO",
       "translation": "A Lucio Escribonio Eufemo, séviro augustal, Lucio Rubrio Eutices, a su amigo.",
-      "context": "Los cognomina griegos son indicios de origen servil. El nombre del colegio de los séviros procede de sex viri, «seis hombres». Estaba vinculado al culto imperial; sus miembros, frecuentemente libertos acomodados, financiaban obras y festejos públicos.",
+      "context": "Los séviros augustales participaban en el culto imperial. El cargo está documentado entre libertos acomodados. Los cognomina griegos de Eufemo y Eutices solo permiten plantear un posible origen servil.",
       "questions": [
         {
           "text": "¿Qué función desempeña Lucius Rubrius Eutyches?",
@@ -66,9 +80,11 @@ globalThis.VE_DATA = {
           "explanation": "Los séviros augustales estaban vinculados al culto del emperador."
         }
       ],
-      "lat": 39.474092,
-      "lon": -0.372696,
-      "zone": 2
+      "lat": 39.4740542,
+      "lon": -0.3726603,
+      "zone": 2,
+      "locationHint": "Busca la inscripción empotrada en la fachada del número 1.",
+      "streetView": "https://maps.app.goo.gl/MBCYQ3S4md1jqhLQ9"
     },
     {
       "id": 3,
@@ -76,9 +92,9 @@ globalThis.VE_DATA = {
       "title": "Inscripción sepulcral de Marco Aquilio Aquilino",
       "street": "C/ Barchilla",
       "date": "Siglo II d. C.",
-      "latin": "M(ARCO) AQVILIO\nAQVILINO\nAN(NORVM) XXXXVI\nL(VCIVS) PORCIVS\nSEVERVS\nAMICO OPTIMO",
-      "translation": "A Marco Aquilio Aquilino, de 46 años, Lucio Porcio Severo, a su mejor amigo.",
-      "context": "Según el dosier, la piedra sirvió en época medieval como modelo para fabricar barchillas, medidas de madera para grano. El texto también recoge una explicación no demostrada del borrado, relacionada con una interpretación de la amistad de los dos hombres.",
+      "latin": "M(ARCO) AQVILIO\nAQVILINO\nAN(NORVM) XXXXVI (?)\nL(VCIVS) PORCIVS\nSEVERVS\nAMICO OPTIMO",
+      "translation": "A Marco Aquilio Aquilino, de 46 años (?), Lucio Porcio Severo, a su mejor amigo.",
+      "context": "La inscripción sepulcral conserva la edad de Aquilino y la dedicatoria de Lucio Porcio Severo, que lo llama amico optimo. La causa del deterioro o borrado del texto es incierta. Corell propone XXXXVI con dudas. El CIL y otros testimonios leen XXXVI, y algunos manuscritos leen XXXV.",
       "questions": [
         {
           "text": "¿Qué función desempeña optimo respecto a amico?",
@@ -91,7 +107,7 @@ globalThis.VE_DATA = {
           "explanation": "Optimo concuerda con amico en dativo singular masculino."
         },
         {
-          "text": "¿A qué edad murió Aquilino?",
+          "text": "¿Qué número representa la lectura XXXXVI?",
           "options": [
             "44 años",
             "56 años",
@@ -101,9 +117,11 @@ globalThis.VE_DATA = {
           "explanation": "XXXXVI = 40 + 6."
         }
       ],
-      "lat": 39.475384,
-      "lon": -0.374807,
-      "zone": 3
+      "lat": 39.475471,
+      "lon": -0.3747699,
+      "zone": 3,
+      "locationHint": "En el muro del Palacio Arzobispal que da a la calle Barchilla, a unos dos metros del suelo.",
+      "streetView": "https://maps.app.goo.gl/RP1HGwqWSwQJXjio6"
     },
     {
       "id": 4,
@@ -136,9 +154,11 @@ globalThis.VE_DATA = {
           "explanation": "Asclepio era el dios de la medicina."
         }
       ],
-      "lat": 39.476233,
-      "lon": -0.374992,
-      "zone": 4
+      "lat": 39.4762275,
+      "lon": -0.3750817,
+      "zone": 4,
+      "locationHint": "En el zócalo de la fachada de la Basílica de los Desamparados que da a la plaza.",
+      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA"
     },
     {
       "id": 5,
@@ -148,7 +168,7 @@ globalThis.VE_DATA = {
       "date": "Segunda mitad del siglo I d. C.",
       "latin": "SERTORIÆ\nQ(VINTI) F(ILIÆ)\nMAXIMÆ\nM(ARCVS) ANTONIVS\nAVITVS\nVXORI\n\nSERTORIÆ\nQ(VINTI) F(ILIÆ)\nMAXIMÆ\nANTONIA\nM(ARCI) F(ILIA) LEPIDA\nMATRI",
       "translation": "Izquierda: A Sertoria Máxima, hija de Quinto; Marco Antonio Avito, a su esposa.\nDerecha: A Sertoria Máxima, hija de Quinto; Antonia Lépida, hija de Marco, a su madre.",
-      "context": "Las inscripciones contiguas honran a Sertoria Máxima, hija de Quinto Sertorio Abascanto según el dosier. Se las dedican su marido y su hija. El dosier descarta por cronología que fuera hija del general Sertorio.",
+      "context": "El marido y la hija de Sertoria Máxima la honran en dos campos contiguos. La filiación solo da el praenomen de su padre, Quinto. Avitus es el cognomen de Marco Antonio.",
       "questions": [
         {
           "text": "¿Qué función desempeña Quinti en Quinti filiæ?",
@@ -171,19 +191,19 @@ globalThis.VE_DATA = {
           "explanation": "Marco Antonio Avito era su marido y Antonia Lépida, su hija."
         }
       ],
-      "lat": 39.476221,
-      "lon": -0.374997,
-      "zone": 4
+      "zone": 4,
+      "locationHint": "En el zócalo de la fachada de la Basílica de los Desamparados que da a la plaza.",
+      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA"
     },
     {
       "id": 6,
       "roman": "VI",
       "title": "Inscripción honorífica a Antonia Lépida",
       "street": "Plaza de la Virgen",
-      "date": "Siglos I–II d. C.",
-      "latin": "ANTONIÆ\nM(ARCI) F(ILIÆ)\nLAPIDÆ\nANATELLON\nLIB(ERTVS)",
+      "date": "Finales del siglo I o principios del II d. C.",
+      "latin": "ANTONIÆ\nM(ARCI) F(ILIÆ)\nLEPIDÆ\nANATELLON\nLIB(ERTVS)",
       "translation": "A Antonia Lépida, hija de Marco; Anatellon, su liberto.",
-      "context": "Antonia Lépida es la hija de Sertoria Máxima y Marco Antonio Avito. Anatellon se identifica como su liberto. Su nombre griego (Ἀνατέλλων) puede interpretarse como «el que se eleva». El dosier propone que la dedicatoria pudo ser un agradecimiento por su liberación. Se conserva LAPIDÆ tal como aparece en la transcripción del dosier; la lectura queda pendiente de cotejo.",
+      "context": "Anatellon se identifica como liberto de Antonia Lépida. Hispania Epigraphica y el CIL editan Lepidae. La transcripción de partida daba LAPIDÆ.",
       "questions": [
         {
           "text": "¿Qué función desempeña libertus respecto a Anatellon?",
@@ -206,9 +226,9 @@ globalThis.VE_DATA = {
           "explanation": "LIB(ERTVS) identifica al dedicante como liberto de Antonia."
         }
       ],
-      "lat": 39.476208,
-      "lon": -0.375,
-      "zone": 4
+      "zone": 4,
+      "locationHint": "En el zócalo de la fachada de la Basílica de los Desamparados que da a la plaza.",
+      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA"
     },
     {
       "id": 7,
@@ -217,8 +237,8 @@ globalThis.VE_DATA = {
       "street": "Plaza de la Virgen",
       "date": "226–235 d. C.",
       "latin": "[[IVLIÆ]]\n[[MAMÆ]]–\n[[AVG(VSTÆ) MA]]–\n[[TRI AVG(VSTI) ET]]\n[[CASTRORVM]]\n[[ET SENATVS]]\nVALENTINI\nVETERANI\nET VETERES",
-      "translation": "A Julia Mamea Augusta, madre de Augusto, del ejército y del Senado; los valentinos veteranos y los antiguos.",
-      "context": "Julia Mamea era la madre de Alejandro Severo (222–235 d. C.). El dosier explica que la inscripción sufrió una damnatio memoriæ y que en 238 d. C. se anuló la condena. En la parte final se distinguen los veterani y los veteres de Valentia. Los dobles corchetes señalan texto borrado.",
+      "translation": "A Julia Mamea Augusta, madre del Augusto, de los campamentos y del Senado. Dedicaron el monumento los valentinos veteranos y antiguos.",
+      "context": "Julia Mamea era madre del emperador Alejandro Severo. Los dobles corchetes señalan el texto borrado. La eliminación del nombre y los títulos documenta una intervención sobre el monumento; su alcance jurídico y una eventual restitución requieren otras pruebas.",
       "questions": [
         {
           "text": "¿Qué función desempeña Valentini veterani et veteres?",
@@ -241,9 +261,9 @@ globalThis.VE_DATA = {
           "explanation": "La condena podía manifestarse mediante la eliminación de nombres e imágenes."
         }
       ],
-      "lat": 39.476192,
-      "lon": -0.375002,
-      "zone": 4
+      "zone": 4,
+      "locationHint": "En el zócalo de la fachada de la Basílica de los Desamparados que da a la plaza.",
+      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA"
     },
     {
       "id": 8,
@@ -251,9 +271,9 @@ globalThis.VE_DATA = {
       "title": "Inscripción honorífica a Marco Aurelio Probo",
       "street": "Plaza de la Virgen",
       "date": "280–281 d. C.",
-      "latin": "[PI]ETATE IVSTITIA FOR[TI]TUDINE\nET PLENO OMNIUM VIRTVTVM\nPRINCIPI VERO [GOTH]ICO\nVEROQVE\nGERMANICO AC VICTORIARVM\nOMNIVM NOMINIBVS INLVSTRI\nM(ARCO) AVR(ELIO) PRO[BO]\nP(IO) F(ELICI) INVICT(O)\nAVG(VSTO)\nPONT(IFICI) MAX(IMO)\nTRIB(VNICIA) P(OTESTATE) V\nP(ATRI)\nP(ATRIÆ) CO(N)S(VLI) IIII\nPROCO(N)S(VLI)\nALLIVS MAXIMVS V(IR)\nC(LARISSIMVS) LEG(ATVS)\nIVR(IDICVS)\nPROV(INCIÆ) HISP(ANIÆ)\nTARRACONENS(IS)\nMAIESTATI EIVS AC NVMINI\nDICATISSIMVS",
-      "translation": "Por su piedad, justicia, fortaleza y pleno de todas las virtudes, al emperador, verdadero Gótico y verdadero Germánico, ilustre por el número de todas sus victorias, Marco Aurelio Probo, Pío, Propicio, Invicto, Augusto, pontífice máximo, en la quinta potestad tribunicia, padre de la patria, cónsul por cuarta vez y procónsul; Alio Máximo, hombre ilustrísimo, legado jurídico de la provincia de Hispania Tarraconense, muy devoto de su majestad y de su deidad.",
-      "context": "Marco Aurelio Probo fue emperador entre 276 y 282 d. C. El dedicante, Alio Máximo, era senador y legado jurídico de Hispania Tarraconense. La inscripción enumera las virtudes y títulos del emperador.",
+      "latin": "[PI]ETATE IVSTITIA FOR[TI]TVDINE\nET PLENO OMNIVM VIRTVTVM\nPRINCIPI VERO [GOTH]ICO VEROQVE\nGERMANICO AC VICTORIARVM\nOMNIVM NOMINIBVS INLVSTRI\nM(ARCO) AVR(ELIO) PRO[BO] P(IO) F(ELICI) INVICT(O) AVG(VSTO)\nPONT(IFICI) MAX(IMO) TRIB(VNICIA) P(OTESTATE) V P(ATRI) P(ATRIÆ) CO(N)S(VLI) IIII\nPROCO(N)S(VLI)\nALLIVS MAXIMVS V(IR) C(LARISSIMVS) LEG(ATVS) IVR(IDICVS)\nPROV(INCIÆ) HISP(ANIÆ) TARRACONENS(IS)\nMAIESTATI EIVS AC NVMINI\nDICATISSIMVS",
+      "translation": "Al príncipe ilustre por su piedad, justicia y fortaleza, pleno de todas las virtudes, verdaderamente Gótico y verdaderamente Germánico, célebre por los títulos de todas sus victorias; a Marco Aurelio Probo, Pío, Feliz, Invicto, Augusto, pontífice máximo, investido de la potestad tribunicia por quinta vez, padre de la patria, cónsul por cuarta vez y procónsul. Alio Máximo, varón clarísimo y legado jurídico de la provincia de Hispania Tarraconense, muy devoto de su majestad y de su numen, le dedica el monumento.",
+      "context": "Marco Aurelio Probo fue emperador entre 276 y 282 d. C. El dedicante, Alio Máximo, era senador y legado jurídico de Hispania Tarraconense. La inscripción enumera las virtudes y títulos del emperador. La quinta potestad tribunicia apunta al año 280 y el cuarto consulado al 281. El CIL antiguo lee III. Corell y Pereira leen IIII y discuten la discrepancia. Los calificativos Gótico y Germánico tienen carácter honorífico en esta dedicatoria.",
       "questions": [
         {
           "text": "¿Qué función desempeña provinciæ Hispaniæ Tarraconensis respecto a legatus iuridicus?",
@@ -276,159 +296,9 @@ globalThis.VE_DATA = {
           "explanation": "El texto lo identifica como legatus iuridicus."
         }
       ],
-      "lat": 39.476173,
-      "lon": -0.375,
-      "zone": 4
+      "zone": 4,
+      "locationHint": "En el zócalo de la fachada de la Basílica de los Desamparados que da a la plaza.",
+      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA"
     }
-  ],
-  "route": [
-    [
-      39.473225,
-      -0.37441
-    ],
-    [
-      39.473229,
-      -0.374334
-    ],
-    [
-      39.473494,
-      -0.374351
-    ],
-    [
-      39.473618,
-      -0.374329
-    ],
-    [
-      39.473419,
-      -0.373347
-    ],
-    [
-      39.473405,
-      -0.373189
-    ],
-    [
-      39.473821,
-      -0.373098
-    ],
-    [
-      39.473777,
-      -0.372747
-    ],
-    [
-      39.473989,
-      -0.372658
-    ],
-    [
-      39.474076,
-      -0.372658
-    ],
-    [
-      39.474537,
-      -0.372722
-    ],
-    [
-      39.47467,
-      -0.372744
-    ],
-    [
-      39.475189,
-      -0.372728
-    ],
-    [
-      39.475196,
-      -0.372859
-    ],
-    [
-      39.475216,
-      -0.373103
-    ],
-    [
-      39.475266,
-      -0.373372
-    ],
-    [
-      39.475372,
-      -0.373701
-    ],
-    [
-      39.475421,
-      -0.373817
-    ],
-    [
-      39.475475,
-      -0.374171
-    ],
-    [
-      39.475504,
-      -0.374385
-    ],
-    [
-      39.475544,
-      -0.374579
-    ],
-    [
-      39.475533,
-      -0.37471
-    ],
-    [
-      39.475467,
-      -0.37475
-    ],
-    [
-      39.475434,
-      -0.374798
-    ],
-    [
-      39.47527,
-      -0.374876
-    ],
-    [
-      39.475119,
-      -0.374925
-    ],
-    [
-      39.47508,
-      -0.375043
-    ],
-    [
-      39.475169,
-      -0.375332
-    ],
-    [
-      39.475218,
-      -0.375609
-    ],
-    [
-      39.475291,
-      -0.375702
-    ],
-    [
-      39.475457,
-      -0.375643
-    ],
-    [
-      39.475579,
-      -0.375571
-    ],
-    [
-      39.475821,
-      -0.375386
-    ],
-    [
-      39.476024,
-      -0.375292
-    ],
-    [
-      39.476204,
-      -0.375209
-    ],
-    [
-      39.476264,
-      -0.375075
-    ],
-    [
-      39.476136,
-      -0.375029
-    ]
   ]
 };
