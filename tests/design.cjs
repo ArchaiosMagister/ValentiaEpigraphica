@@ -86,8 +86,33 @@ async function theme(page, value) {
       await layout(page, 'results ' + value);
       assert.equal(await page.locator('.score').textContent(), '0/24');
     }
-    await context.setOffline(true);
+    // WebKit's offline emulation may fail before dispatching navigation to
+    // the service worker. In CI, stop the real HTTP origin instead.
+    assert.ok(await page.evaluate(() => !!navigator.serviceWorker.controller),
+      'Page must be controlled by the installed service worker');
+    const serverPid = process.env.VE_SERVER_PID;
+    if (serverPid) {
+      const pid = Number(serverPid);
+      assert.ok(Number.isSafeInteger(pid) && pid > 1 && pid !== process.pid);
+      process.kill(pid, 'SIGTERM');
+      let disconnected = false;
+      for (let i = 0; i < 30; i++) {
+        try {
+          await fetch(new URL('index.html', base), { cache: 'no-store', signal: AbortSignal.timeout(1000) });
+        } catch {
+          disconnected = true;
+          break;
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      assert.ok(disconnected, 'The HTTP origin must be unreachable before the offline reload');
+      console.log('HTTP origin stopped and independently confirmed unreachable.');
+    } else {
+      await context.setOffline(true);
+    }
     await page.reload();
+    assert.ok(await page.evaluate(() => !!navigator.serviceWorker.controller),
+      'Offline navigation must remain controlled by the service worker');
     await loadFonts(page);
     await page.locator('nav [data-tab=list]').click();
     await page.locator('.list-item[data-open="1"]').click();
