@@ -39,6 +39,16 @@ globalThis.VE_DATA = {
           ],
           "correct": 0,
           "explanation": "Los dedicantes honran a Quinto Junio Crates y lo llaman amigo."
+        },
+        {
+          "text": "¿Qué pista del texto sugiere que los dos dedicantes de Crates tuvieron un antiguo propietario común?",
+          "options": [
+            "El mismo praenomen: Gayo",
+            "El mismo nomen: Riccius/Riccia",
+            "El mismo cognomen: Crates"
+          ],
+          "correct": 1,
+          "explanation": "Comparten el *nomen* *Riccius/Riccia*. Es un indicio de un posible patrono común, no una prueba concluyente."
         }
       ],
       "lat": 39.4732235,
@@ -194,14 +204,14 @@ globalThis.VE_DATA = {
       "context": "Asclepio, hijo de Apolo y educado por Quirón, tenía un célebre santuario en Epidauro. Según la tradición, Hipócrates descendía de Asclepio. El *cognomen* griego de Higino y su condición de séviro augustal son indicios de que era liberto.",
       "questions": [
         {
-          "text": "¿Qué función desempeña *deo* respecto a *Asclepio*?",
+          "text": "¿Qué función sintáctica desempeña el sintagma *Asclepio deo* en la inscripción?",
           "options": [
+            "Sujeto de la dedicatoria",
             "Complemento directo",
-            "Aposición",
-            "Complemento circunstancial"
+            "Complemento indirecto (destinatario)"
           ],
-          "correct": 1,
-          "explanation": "*Deo* está en dativo y precisa la identidad de *Asclepio*."
+          "correct": 2,
+          "explanation": "El sintagma completo *Asclepio deo* está en dativo e identifica al destinatario de la dedicatoria: «al dios Asclepio»."
         },
         {
           "text": "¿De qué era dios Asclepio?",
@@ -222,6 +232,16 @@ globalThis.VE_DATA = {
           ],
           "correct": 2,
           "explanation": "Es una ofrenda al dios Asclepio. El destinatario aparece en *Asclepio deo*."
+        },
+        {
+          "text": "Según la tradición mitológica, ¿quién fue el padre de Asclepio y quién lo educó?",
+          "options": [
+            "Zeus y Prometeo",
+            "Apolo y Quirón",
+            "Hermes y Sileno"
+          ],
+          "correct": 1,
+          "explanation": "Asclepio era hijo de Apolo y fue educado por el centauro Quirón."
         }
       ],
       "lat": 39.4762275,

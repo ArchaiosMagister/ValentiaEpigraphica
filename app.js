@@ -18,6 +18,9 @@ function normalizeAnswers(raw) {
     for (const field of ['draft', 'graded']) {
       if (!Array.isArray(entry[field])) continue;
       record[field] = x.questions.map((q, i) => {
+        // The original Asclepius question (IV.1) was replaced. Legacy
+        // index-only progress must not grade the new question with its old answer.
+        if (!snapshot && x.id === 4 && i === 0) return null;
         const oldIndex = snapshot ? snapshot.findIndex(old => old?.text === q.text) : i;
         if (oldIndex < 0) return null;
         const value = entry[field][oldIndex];
@@ -228,7 +231,7 @@ function renderWelcome() {
     <div class="welcome-cenefa" aria-hidden="true"></div>
     <div class="welcome-body">
       <h2>Ocho inscripciones romanas</h2>
-      <p>Recorre el centro de Valencia, lee cada inscripción en su lugar y responde tres preguntas breves.</p>
+      <p>Recorre el centro de Valencia, lee cada inscripción en su lugar y responde tres o cuatro preguntas breves.</p>
       <div class="welcome-facts"><div><strong aria-hidden="true">VIII</strong><span>8 inscripciones</span></div><div><strong aria-hidden="true">IV</strong><span>4 localizaciones</span></div></div>
       <button class="primary wide" data-go="route">Empezar recorrido</button>
       ${inscriptionTypes(true)}
