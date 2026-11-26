@@ -41,3 +41,27 @@ fieldset { min-inline-size: 0; }
   .card { padding: 13px; }
   .zone { align-items: flex-start; }
 }
+
+.install-panel { max-width: 740px; margin: 10px auto 0; padding: 0 16px; }
+.install-button { color: var(--green); font-weight: 700; }
+.install-panel p { margin: 8px 0 0; font-size: .875rem; }
+
+nav[hidden] { display: none; }
+.welcome { margin-top: clamp(1rem, 7vh, 4rem); }
+.welcome p { max-width: 44ch; margin: 1rem 0 1.5rem; }
+.next-stop { margin-bottom: .75rem; }
+.gps-controls { padding: .85rem 0; border-block-start: 1px solid var(--line); }
+.install-button { min-height: 44px; color: var(--muted); font-size: .875rem; font-weight: 600; }
+.transcription { margin-block: 1rem; }
+.epigraph {
+  overflow-x: auto;
+  padding: 1rem;
+  text-align: start;
+  white-space: pre;
+  overflow-wrap: normal;
+  line-height: 1.85;
+  margin: .5rem 0 0;
+}
+.epigraph.enlarged { font-size: 1.25rem; }
+.quiz-result:empty { margin: 0; }
+.quiz-result:not(:empty) { margin: .75rem 0 0; }
