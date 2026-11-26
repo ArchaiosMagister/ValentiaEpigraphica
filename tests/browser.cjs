@@ -31,6 +31,12 @@ require('../data.js');
       await page.locator('.list-item[data-open="' + item.id + '"]').click();
       assert.equal(await page.locator('h2').textContent(), item.title);
       assert.equal(await page.locator('fieldset').count(), 2);
+      const fields = page.locator('#latin-text pre');
+      assert.deepEqual(await fields.allTextContents(), item.latin.split('\n\n'));
+      assert.equal(await fields.first().evaluate(field => getComputedStyle(field).fontVariantCaps), 'small-caps');
+      if (item.id === 4) {
+        assert.deepEqual(await page.locator('legend i[lang=la]').allTextContents(), ['deo', 'Asclepio']);
+      }
       for (const [i, question] of item.questions.entries()) {
         assert.equal(question.options.length, 3);
         assert.ok(Number.isInteger(question.correct) && question.correct >= 0 && question.correct < 3);
@@ -65,6 +71,24 @@ require('../data.js');
     await page.locator('nav [data-tab=list]').click();
     await page.locator('.list-item[data-open="1"]').click();
     assert.ok(await page.locator('.photo img').evaluate(img => img.decode().then(() => img.naturalWidth)));
+    for (const item of items) {
+      await page.locator('nav [data-tab=list]').click();
+      await page.locator('.list-item[data-open="' + item.id + '"]').click();
+      assert.ok(item.photos.length > 0);
+      const figures = page.locator('.photo');
+      assert.equal(await figures.count(), item.photos.length);
+      for (const [index, photo] of item.photos.entries()) {
+        const figure = figures.nth(index);
+        assert.equal(await figure.locator('a').first().getAttribute('href'), photo.src);
+        assert.ok(await figure.locator('img').evaluate(img => img.decode().then(() => img.naturalWidth)));
+      }
+    }
+    const popupEvent = page.waitForEvent('popup');
+    await page.locator('.photo > a').first().click();
+    const enlarged = await popupEvent;
+    await enlarged.waitForLoadState();
+    assert.ok(await enlarged.locator('img').evaluate(img => img.decode().then(() => img.naturalWidth)));
+    await enlarged.close();
     for (const width of [320, 390, 412, 768, 1280]) {
       await page.setViewportSize({ width, height: 850 });
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'horizontal overflow at ' + width);
