@@ -1,12 +1,40 @@
-# Valentia Epigraphica — prototipo 0.1
-PWA estática en castellano, sin dependencias ni backend. Abrir `index.html` permite probar fichas y preguntas localmente. Para GPS y funcionamiento offline PWA, servir mediante HTTPS (GitHub Pages) o localhost. Para probar en ordenador: `python3 -m http.server 8000` desde esta carpeta y visitar http://localhost:8000. En iPhone/iPad: publicar en Pages, abrir Safari y Añadir a pantalla de inicio; abrir una vez con conexión y comprobar después en modo avión.
+# Valentia Epigraphica
 
-## Datos y decisiones
-Ocho fichas basadas en el dosier «inscripciones imprimible» y el cuestionario «ACTIVIDAD INSCRIPCIONES»; 16 preguntas de selección múltiple. Se han corregido nomen Riccius (no praenomen) y la traducción de Avitus como cognomen. LAPIDÆ se conserva con advertencia. El contexto histórico es resumido y las hipótesis no se presentan como certezas. No es una edición epigráfica crítica.
+PWA estática en castellano para visitar ocho inscripciones romanas de Valencia. Las cuatro zonas se muestran en un callejero local. El número de zona marca el orden de la visita. Dentro de la plaza, las fichas IV–VIII comparten una referencia geográfica orientativa.
 
-Coordenadas y trazado extraídos de ruta-por-la-inscripciones-romanas-de-valencia.gpx, ruta de Wikiloc 36562169, dibujada manualmente. Plano esquemático (puntos de track 78–114, índices desde cero) sin cartografía base. Cuatro zonas de proximidad; los cuatro últimos puntos tienen nombre genérico y su asignación individual es provisional. No se incluyen fotografías: los documentos no contienen fotos y faltan imágenes verificadas con permiso de uso. Las distancias son en línea recta, aproximadas. GPS no obligatorio, no se conserva ni envía. El seguimiento se detiene al ocultar la página.
+La web guarda en el navegador las respuestas elegidas, las últimas respuestas comprobadas y el tema. La ubicación se activa voluntariamente, se usa en memoria y el seguimiento termina al ocultar la página o acceder a Resultados. La puntuación se basa en las últimas respuestas comprobadas.
 
-El progreso se guarda localmente; puntuación sobre 16 según últimas respuestas comprobadas; se permite corregir sin penalización. Reinicio con confirmación. No hay exportación de resultados ni versión valenciana aún. No hay registros de alumnos.
+## Pruebas y GitHub Pages
 
-## Publicar
-Crear repositorio independiente `ValentiaEpigraphica`, copiar los archivos a la raíz de `main`, habilitar Pages desde esa rama y la carpeta raíz. No hay compilación. Cambiar la versión de caché en `sw.js` al publicar cambios. Revisar derechos/atribución del trazado y de futuras imágenes antes de difusión pública. Comprobar ubicaciones y GPS in situ.
+Desde la carpeta que contiene el repositorio, ejecuta `python3 -m http.server 8765 --bind 127.0.0.1` y abre `http://localhost:8765/ValentiaEpigraphica/`. La prueba usa Node y Playwright disponible en el entorno de desarrollo. Ejecuta `node tests/browser.cjs`. Las variables opcionales `VE_URL`, `PLAYWRIGHT_MODULE` y `BROWSER_EXECUTABLE` permiten configurar el servidor, el módulo y el navegador.
+
+La raíz del repositorio contiene todos los recursos necesarios para Pages. Una vez autorizada la publicación, usa la carpeta raíz de la rama aprobada como origen. La aplicación utiliza URLs relativas y funciona bajo el prefijo del proyecto. Sube todos los recursos de cada versión juntos, añade cada archivo nuevo a `sw.js` e incrementa su versión de caché. Cerrar todas las pestañas y ventanas de la aplicación permite activar un worker actualizado que esté en espera. La clave de progreso se conserva entre versiones.
+
+La prueba automatizada ejecutada en Brave incluye la recarga con la red deshabilitada, con comprobación de mapa, fotografía y puntuación, además de las ocho fichas, las 16 preguntas, navegación, reinicio y temas. El GPS y los tamaños de pantalla son simulaciones. Quedan pendientes la instalación desde el menú del navegador, la comprobación en iPhone, Android e iPad físicos, el recorrido a pie y la comprobación de la URL definitiva en GitHub Pages.
+
+## Edición y procedencia
+
+La transcripción didáctica usa mayúsculas y V epigráfica, Æ para AE según el criterio tipográfico de la ficha, paréntesis para desarrollos, corchetes para restituciones y dobles corchetes para borrados. El signo (?) indica lectura dudosa. Los repertorios conservan el aparato crítico completo.
+
+| Ficha | Cotejo y decisiones |
+| --- | --- |
+| I | Corell, n.º 30 y CIL II²/14, 65. Se sigue ATIMETVS en Corell. La descripción de Commons ofrece ATIMETIUS. Riccius y Riccia son el gentilicio. El origen servil es una hipótesis onomástica. |
+| II | Corell, n.º 33 y CIL II²/14, 29. Eufemo recibe el homenaje y Eutiques lo dedica. Su cognomen griego no establece por sí solo un estatuto jurídico. |
+| III | Corell, n.º 50 y CIL II²/14, 46. Corell registra el deterioro histórico, una limpieza posterior y edades divergentes. El ejercicio pregunta qué número expresa la lectura preferida, XXXXVI. |
+| IV | Corell, n.º 2 y CIL II²/14, 2. Se conserva la distribución en seis líneas. El dativo DEO explicita la condición del destinatario. |
+| V | Corell, n.º 34 y CIL II²/14, 76. Los dos textos permiten identificar esposo e hija. La filiación solo transmite el praenomen Quinto. Avitus se conserva como cognomen. |
+| VI | Corell, n.º 27, Hispania Epigraphica y CIL II²/14, 43 editan LEPIDÆ frente a LAPIDÆ del dosier. La condición de liberto está explícita. |
+| VII | Corell y el estudio de Alföldy discrepan en la restitución de líneas martilladas. Se sigue la disposición transmitida por Corell para la ficha. La fecha 238 se retira del relato, pues el monumento no permite fechar una revocación. |
+| VIII | Corell y Pereira, CIL II 3738. Se adopta la disposición de Corell, F(elici), y el consulado IIII, con nota sobre la variante III. Corell vincula los ablativos iniciales a inlustri. Pereira y Corell discrepan sobre el posible borrado del nombre. |
+
+- [Josep Corell, Inscripcions romanes del País Valencià V, Universitat de València](https://roderic.uv.es/bitstream/handle/10550/84089/9788411180238.pdf?sequence=1)
+- [Gerardo Pereira Menaut, Inscripciones romanas de Valentia](https://mupreva.org/web_mupreva_dedalo/publicaciones/95/fr)
+- [Hispania Epigraphica Online, Antonia Lépida y Aquilino](https://hepol.uah.es/pub/list.php?page=479)
+- [Estudio de Géza Alföldy sobre inscripciones tarraconenses](https://recercat.cat/bitstream/id/144128/GezaAlfoldy-EstudiosTarraconenses.pdf)
+
+## Cartografía y fotografías
+
+- El callejero contiene vías de un extracto API de OpenStreetMap para el rectángulo `-0.3761,39.4725,-0.3719,39.4770`. El archivo `map.js` contiene las geometrías proyectadas de dicho extracto bajo ODbL. Las posiciones de las cuatro zonas vienen de la versión inicial y requieren cotejo sobre el terreno. [OpenStreetMap y ODbL](https://www.openstreetmap.org/copyright)
+- La ruta de Elia.S.D. sirvió para identificar lugares. El GPX bruto y la licencia de redistribución del trazado heredado siguen pendientes de comprobación. El callejero usa las zonas numeradas para mostrar la secuencia. [Wikiloc](https://es.wikiloc.com/rutas-a-pie/ruta-por-la-inscripciones-romanas-de-valencia-36562169)
+- Ficha I, fotografía de Joanbanjo, CC BY-SA 3.0, reducida a 1400 píxeles y recomprimida. [Ficha de Commons](https://commons.wikimedia.org/wiki/File:Inscripció_romana_al_carrer_de_Vidal_de_València.JPG)
+- Para incorporar fotografías propias a II–VIII, guarda los archivos en `photos/` y añade sus datos a la lista `photos` de cada ficha en `data.js`, siguiendo el ejemplo de I. El formato admite varias imágenes por ficha, incluida una vista contextual. El toque abre la imagen local a tamaño completo. Incluye las imágenes en la lista del service worker para su uso sin conexión.

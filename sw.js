@@ -1,1 +1,39 @@
-const CACHE='valentia-epigraphica-1';const ASSETS=['./','./index.html','./style.css','./app.js','./data.js','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png'];self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('valentia-epigraphica-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).origin!==self.location.origin)return;e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).catch(err=>{if(e.request.mode==='navigate')return caches.match('./index.html');throw err})))})
+'use strict';
+
+const scope = self.registration.scope;
+const prefix = 'valentia-epigraphica:' + scope + ':';
+const version = prefix + '1.0-rc1';
+const index = new URL('index.html', scope).href;
+const assets = new Set([
+  'index.html', 'style.css', 'data.js', 'map.js', 'app.js',
+  'manifest.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png',
+  'photos/crates.jpg',
+].map(path => new URL(path, scope).href));
+
+self.addEventListener('install', event => {
+  event.waitUntil(caches.open(version).then(cache =>
+    cache.addAll([...assets].map(url => new Request(url, { cache: 'reload' })))
+  ));
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => key.startsWith(prefix) && key !== version)
+      .map(key => caches.delete(key)));
+    await self.clients.claim();
+  })());
+});
+
+self.addEventListener('fetch', event => {
+  const { request } = event;
+  const url = new URL(request.url);
+  if (request.method !== 'GET' || !url.href.startsWith(scope)) return;
+  const isEntry = request.mode === 'navigate' &&
+    (url.pathname === new URL(scope).pathname || url.pathname === new URL(index).pathname);
+  const key = isEntry ? index : url.href;
+  if (!assets.has(key)) return;
+  event.respondWith(caches.open(version).then(cache =>
+    cache.match(key).then(response => response || fetch(request))
+  ));
+});
