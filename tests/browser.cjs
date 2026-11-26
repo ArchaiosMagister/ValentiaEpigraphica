@@ -65,6 +65,24 @@ require('../data.js');
     await page.locator('nav [data-tab=list]').click();
     await page.locator('.list-item[data-open="1"]').click();
     assert.ok(await page.locator('.photo img').evaluate(img => img.decode().then(() => img.naturalWidth)));
+    for (const item of items) {
+      await page.locator('nav [data-tab=list]').click();
+      await page.locator('.list-item[data-open="' + item.id + '"]').click();
+      assert.ok(item.photos.length > 0);
+      const figures = page.locator('.photo');
+      assert.equal(await figures.count(), item.photos.length);
+      for (const [index, photo] of item.photos.entries()) {
+        const figure = figures.nth(index);
+        assert.equal(await figure.locator('a').first().getAttribute('href'), photo.src);
+        assert.ok(await figure.locator('img').evaluate(img => img.decode().then(() => img.naturalWidth)));
+      }
+    }
+    const popupEvent = page.waitForEvent('popup');
+    await page.locator('.photo > a').first().click();
+    const enlarged = await popupEvent;
+    await enlarged.waitForLoadState();
+    assert.ok(await enlarged.locator('img').evaluate(img => img.decode().then(() => img.naturalWidth)));
+    await enlarged.close();
     for (const width of [320, 390, 412, 768, 1280]) {
       await page.setViewportSize({ width, height: 850 });
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'horizontal overflow at ' + width);

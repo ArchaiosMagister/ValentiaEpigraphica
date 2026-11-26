@@ -2,12 +2,20 @@
 
 const scope = self.registration.scope;
 const prefix = 'valentia-epigraphica:' + scope + ':';
-const version = prefix + '1.0-rc4';
+const version = prefix + '1.0-rc5';
 const index = new URL('index.html', scope).href;
 const assets = new Set([
   'index.html', 'style.css', 'data.js', 'map.js', 'app.js',
   'manifest.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png',
   'photos/crates.jpg',
+  'photos/eufemo.jpg',
+  'photos/aquilino.jpg',
+  'photos/asclepio.jpg',
+  'photos/sertoria.jpg',
+  'photos/antonia.jpg',
+  'photos/mamea.jpg',
+  'photos/probo.jpg',
+  'photos/basilica.jpg',
 ].map(path => new URL(path, scope).href));
 
 self.addEventListener('install', event => {

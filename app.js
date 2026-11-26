@@ -46,12 +46,17 @@ function xy(lat, lon) {
 const mapBase = globalThis.VE_MAP || '';
 const mapCaption = mapBase ? '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a> · Zonas numeradas en orden.' : 'Zonas numeradas en orden, norte arriba.';
 function photos(item) {
-  return (item.photos || []).map(photo => `<figure class="photo">
-    <a href="${esc(photo.src)}" target="_blank" rel="noopener" aria-label="Ampliar fotografía">
+  const [detail, ...context] = item.photos || [];
+  if (!detail) return '';
+  const figure = photo => `<figure class="photo">
+    <a href="${esc(photo.src)}" target="_blank" rel="noopener" aria-label="Ampliar fotografía: ${esc(photo.alt)}">
       <img src="${esc(photo.src)}" alt="${esc(photo.alt)}" width="${photo.width}" height="${photo.height}">
     </a>
-    <figcaption><a href="${esc(photo.source)}">${esc(photo.author)}</a> · <a href="${esc(photo.licenseUrl)}">${esc(photo.license)}</a></figcaption>
-  </figure>`).join('');
+    <figcaption><a href="${esc(photo.source)}">${esc(photo.author)}</a> · <a href="${esc(photo.licenseUrl)}">${esc(photo.license)}</a> · ${esc(photo.adaptation)}</figcaption>
+  </figure>`;
+  return figure(detail) + (context.length
+    ? `<details><summary>Ver el conjunto en la fachada</summary>${context.map(figure).join('')}</details>`
+    : '');
 }
 function map(){const dots=zones.map(z=>{const [x,y]=xy(z.lat,z.lon);return `<g><circle class="dot" cx="${x}" cy="${y}" r="13"/><text x="${x}" y="${y+4}" text-anchor="middle">${z.zone}</text></g>`}).join('');let user='';if(position){const [x,y]=xy(position.latitude,position.longitude);if(x>=0&&x<=mapWidth&&y>=0&&y<=350)user=`<circle class="accuracy" cx="${x}" cy="${y}" r="${Math.min(200,position.accuracy/111195*scale)}"/><circle class="user" cx="${x}" cy="${y}" r="6"/>`;}return `<svg class="map" viewBox="0 0 ${mapWidth} 350" role="img" aria-label="Callejero del itinerario con cuatro zonas numeradas y el norte arriba">${mapBase}${dots}${user}<path d="M233 35 L233 16 M229 22 L233 16 L237 22" fill="none" stroke="currentColor" stroke-width="2"/><text x="233" y="12" text-anchor="middle" style="fill:currentColor">N</text></svg>`}
 function progress(){return `<div class="row"><span>Inscripciones completadas</span><strong>${count()}/8</strong></div><div class="progress" role="progressbar" aria-label="Inscripciones completadas" aria-valuenow="${count()}" aria-valuemin="0" aria-valuemax="8"><span style="width:${count()/8*100}%"></span></div>`}

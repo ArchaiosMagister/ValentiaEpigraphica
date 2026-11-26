@@ -43,7 +43,8 @@ globalThis.VE_DATA = {
           "author": "Joanbanjo",
           "source": "https://commons.wikimedia.org/wiki/File:Inscripció_romana_al_carrer_de_Vidal_de_València.JPG",
           "license": "CC BY-SA 3.0",
-          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/"
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+          "adaptation": "Reducción y compresión"
         }
       ],
       "locationHint": "En la fachada de la calle Vidal, en la esquina del edificio de Banca March.",
@@ -84,7 +85,20 @@ globalThis.VE_DATA = {
       "lon": -0.3726603,
       "zone": 2,
       "locationHint": "Busca la inscripción empotrada en la fachada del número 1.",
-      "streetView": "https://maps.app.goo.gl/MBCYQ3S4md1jqhLQ9"
+      "streetView": "https://maps.app.goo.gl/MBCYQ3S4md1jqhLQ9",
+      "photos": [
+        {
+          "src": "photos/eufemo.jpg",
+          "alt": "Pedestal dedicado a Lucio Escribonio Eufemo en Trinquete de los Caballeros",
+          "width": 804,
+          "height": 1250,
+          "author": "Joanbanjo",
+          "source": "https://commons.wikimedia.org/wiki/File:Làpida_romana_al_carrer_del_Trinquet_de_Cavallers,_València.JPG",
+          "license": "CC BY-SA 3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+          "adaptation": "Reducción y compresión"
+        }
+      ]
     },
     {
       "id": 3,
@@ -121,7 +135,20 @@ globalThis.VE_DATA = {
       "lon": -0.3747699,
       "zone": 3,
       "locationHint": "En el muro del Palacio Arzobispal que da a la calle Barchilla, a unos dos metros del suelo.",
-      "streetView": "https://maps.app.goo.gl/RP1HGwqWSwQJXjio6"
+      "streetView": "https://maps.app.goo.gl/RP1HGwqWSwQJXjio6",
+      "photos": [
+        {
+          "src": "photos/aquilino.jpg",
+          "alt": "Lápida sepulcral de Marco Aquilio Aquilino en la calle Barchilla",
+          "width": 1250,
+          "height": 833,
+          "author": "Jerónimo Roure Pérez (Dorieo), Wikimedia Commons",
+          "source": "https://commons.wikimedia.org/wiki/File:Inscripción_homosexual_romana_en_la_calle_de_la_Barchilla,_Valencia.jpg",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "adaptation": "Reducción y compresión"
+        }
+      ]
     },
     {
       "id": 4,
@@ -158,7 +185,31 @@ globalThis.VE_DATA = {
       "lon": -0.3750817,
       "zone": 4,
       "locationHint": "En el zócalo de la fachada de la Basílica de los Desamparados que da a la plaza.",
-      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA"
+      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA",
+      "photos": [
+        {
+          "src": "photos/asclepio.jpg",
+          "alt": "Ara de Asclepio con ASCLEPIO DEO en la parte superior",
+          "width": 918,
+          "height": 1250,
+          "author": "Ripoll531",
+          "source": "https://commons.wikimedia.org/wiki/File:Lápidas_romanas_encastradas_en_la_Catedral_de_Valencia.jpg",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "adaptation": "Recorte y reducción"
+        },
+        {
+          "src": "photos/basilica.jpg",
+          "alt": "Zócalo de la Basílica con las seis inscripciones, de Asclepio a Probo",
+          "width": 1250,
+          "height": 807,
+          "author": "César Guardeño Gil · Círculo por la Defensa y Difusión del Patrimonio Cultural",
+          "source": "https://conocevalenciapaseando.blogspot.com/2009/11/inscripciones-romanas-basilica-de-la.html",
+          "license": "CC BY-NC-SA 3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+          "adaptation": "Reducción y compresión"
+        }
+      ]
     },
     {
       "id": 5,
@@ -193,7 +244,31 @@ globalThis.VE_DATA = {
       ],
       "zone": 4,
       "locationHint": "En el zócalo de la fachada de la Basílica de los Desamparados que da a la plaza.",
-      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA"
+      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA",
+      "photos": [
+        {
+          "src": "photos/sertoria.jpg",
+          "alt": "Los dos campos epigráficos contiguos dedicados a Sertoria Máxima",
+          "width": 1250,
+          "height": 1136,
+          "author": "Ripoll531",
+          "source": "https://commons.wikimedia.org/wiki/File:Lápidas_romanas_encastradas_en_la_Catedral_de_Valencia.jpg",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "adaptation": "Recorte y reducción"
+        },
+        {
+          "src": "photos/basilica.jpg",
+          "alt": "Zócalo de la Basílica con las seis inscripciones, de Asclepio a Probo",
+          "width": 1250,
+          "height": 807,
+          "author": "César Guardeño Gil · Círculo por la Defensa y Difusión del Patrimonio Cultural",
+          "source": "https://conocevalenciapaseando.blogspot.com/2009/11/inscripciones-romanas-basilica-de-la.html",
+          "license": "CC BY-NC-SA 3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+          "adaptation": "Reducción y compresión"
+        }
+      ]
     },
     {
       "id": 6,
@@ -228,7 +303,31 @@ globalThis.VE_DATA = {
       ],
       "zone": 4,
       "locationHint": "En el zócalo de la fachada de la Basílica de los Desamparados que da a la plaza.",
-      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA"
+      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA",
+      "photos": [
+        {
+          "src": "photos/antonia.jpg",
+          "alt": "Inscripción de mármol rosado dedicada a Antonia Lépida",
+          "width": 1127,
+          "height": 1250,
+          "author": "Ripoll531",
+          "source": "https://commons.wikimedia.org/wiki/File:Lápidas_romanas_en_la_Catedral_de_Valencia.jpg",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "adaptation": "Recorte y reducción"
+        },
+        {
+          "src": "photos/basilica.jpg",
+          "alt": "Zócalo de la Basílica con las seis inscripciones, de Asclepio a Probo",
+          "width": 1250,
+          "height": 807,
+          "author": "César Guardeño Gil · Círculo por la Defensa y Difusión del Patrimonio Cultural",
+          "source": "https://conocevalenciapaseando.blogspot.com/2009/11/inscripciones-romanas-basilica-de-la.html",
+          "license": "CC BY-NC-SA 3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+          "adaptation": "Reducción y compresión"
+        }
+      ]
     },
     {
       "id": 7,
@@ -263,7 +362,31 @@ globalThis.VE_DATA = {
       ],
       "zone": 4,
       "locationHint": "En el zócalo de la fachada de la Basílica de los Desamparados que da a la plaza.",
-      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA"
+      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA",
+      "photos": [
+        {
+          "src": "photos/mamea.jpg",
+          "alt": "Inscripción de Julia Mamea con las líneas finales de los dedicantes",
+          "width": 937,
+          "height": 1250,
+          "author": "César Guardeño Gil · Círculo por la Defensa y Difusión del Patrimonio Cultural",
+          "source": "https://conocevalenciapaseando.blogspot.com/2009/11/inscripciones-romanas-basilica-de-la_30.html",
+          "license": "CC BY-NC-SA 3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+          "adaptation": "Reducción y compresión"
+        },
+        {
+          "src": "photos/basilica.jpg",
+          "alt": "Zócalo de la Basílica con las seis inscripciones, de Asclepio a Probo",
+          "width": 1250,
+          "height": 807,
+          "author": "César Guardeño Gil · Círculo por la Defensa y Difusión del Patrimonio Cultural",
+          "source": "https://conocevalenciapaseando.blogspot.com/2009/11/inscripciones-romanas-basilica-de-la.html",
+          "license": "CC BY-NC-SA 3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+          "adaptation": "Reducción y compresión"
+        }
+      ]
     },
     {
       "id": 8,
@@ -298,7 +421,31 @@ globalThis.VE_DATA = {
       ],
       "zone": 4,
       "locationHint": "En el zócalo de la fachada de la Basílica de los Desamparados que da a la plaza.",
-      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA"
+      "streetView": "https://maps.app.goo.gl/G4nmFzRCp6Y8oDdEA",
+      "photos": [
+        {
+          "src": "photos/probo.jpg",
+          "alt": "Pedestal de Marco Aurelio Probo, con el campo epigráfico muy deteriorado",
+          "width": 937,
+          "height": 1250,
+          "author": "César Guardeño Gil · Círculo por la Defensa y Difusión del Patrimonio Cultural",
+          "source": "https://conocevalenciapaseando.blogspot.com/2009/11/inscripciones-romanas-basilica-de-la_30.html",
+          "license": "CC BY-NC-SA 3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+          "adaptation": "Reducción y compresión"
+        },
+        {
+          "src": "photos/basilica.jpg",
+          "alt": "Zócalo de la Basílica con las seis inscripciones, de Asclepio a Probo",
+          "width": 1250,
+          "height": 807,
+          "author": "César Guardeño Gil · Círculo por la Defensa y Difusión del Patrimonio Cultural",
+          "source": "https://conocevalenciapaseando.blogspot.com/2009/11/inscripciones-romanas-basilica-de-la.html",
+          "license": "CC BY-NC-SA 3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/3.0/",
+          "adaptation": "Reducción y compresión"
+        }
+      ]
     }
   ]
 };

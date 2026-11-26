@@ -36,8 +36,21 @@ La transcripción didáctica usa mayúsculas y V epigráfica, Æ para AE según 
 
 - El callejero contiene vías de un extracto API de OpenStreetMap para el rectángulo `-0.3761,39.4725,-0.3719,39.4770`. El archivo `map.js` contiene las geometrías proyectadas de dicho extracto bajo ODbL. Las cuatro referencias de proximidad corresponden a las posiciones de cámara de las panorámicas aportadas por el docente. Son puntos de aproximación a las fachadas. [OpenStreetMap y ODbL](https://www.openstreetmap.org/copyright)
 - La ruta de Elia.S.D. sirvió para identificar lugares. El GPX bruto y la licencia de redistribución del trazado heredado siguen pendientes de comprobación. El callejero usa las zonas numeradas para mostrar la secuencia. [Wikiloc](https://es.wikiloc.com/rutas-a-pie/ruta-por-la-inscripciones-romanas-de-valencia-36562169)
-- Ficha I, fotografía de Joanbanjo, CC BY-SA 3.0, reducida a 1400 píxeles y recomprimida. [Ficha de Commons](https://commons.wikimedia.org/wiki/File:Inscripció_romana_al_carrer_de_Vidal_de_València.JPG)
-- Para incorporar fotografías propias a II–VIII, guarda los archivos en `photos/` y añade sus datos a la lista `photos` de cada ficha en `data.js`, siguiendo el ejemplo de I. El formato admite varias imágenes por ficha, incluida una vista contextual. El toque abre la imagen local a tamaño completo. Incluye las imágenes en la lista del service worker para su uso sin conexión.
+### Créditos de las fotografías
+
+| Fichas | Fuente y autoría | Licencia |
+| --- | --- | --- |
+| I | [Calle Vidal, Joanbanjo](https://commons.wikimedia.org/wiki/File:Inscripció_romana_al_carrer_de_Vidal_de_València.JPG) | CC BY-SA 3.0 |
+| II | [Eufemo, Joanbanjo](https://commons.wikimedia.org/wiki/File:Làpida_romana_al_carrer_del_Trinquet_de_Cavallers,_València.JPG) | CC BY-SA 3.0 |
+| III | [Aquilino, Jerónimo Roure Pérez (Dorieo)](https://commons.wikimedia.org/wiki/File:Inscripción_homosexual_romana_en_la_calle_de_la_Barchilla,_Valencia.jpg) | CC BY-SA 4.0 |
+| IV–V | [Asclepio y Sertoria, Ripoll531](https://commons.wikimedia.org/wiki/File:Lápidas_romanas_encastradas_en_la_Catedral_de_Valencia.jpg) | CC BY-SA 4.0 |
+| VI | [Antonia, Ripoll531](https://commons.wikimedia.org/wiki/File:Lápidas_romanas_en_la_Catedral_de_Valencia.jpg) | CC BY-SA 4.0 |
+| VII–VIII | [Julia Mamea y Probo, César Guardeño Gil y Círculo por la Defensa y Difusión del Patrimonio Cultural](https://conocevalenciapaseando.blogspot.com/2009/11/inscripciones-romanas-basilica-de-la_30.html) | CC BY-NC-SA 3.0 |
+| IV–VIII | [Vista de conjunto, César Guardeño Gil y Círculo por la Defensa y Difusión del Patrimonio Cultural](https://conocevalenciapaseando.blogspot.com/2009/11/inscripciones-romanas-basilica-de-la.html) | CC BY-NC-SA 3.0 |
+
+Las copias se optimizaron para el uso sin conexión. Las fichas IV–VI muestran recortes. Las imágenes mantienen su licencia respectiva. Las de César Guardeño Gil y el Círculo se usan en esta aplicación educativa no comercial. El registro de Wikiloc sirvió para cotejar las piezas. Sus fotografías quedan en el sitio original.
+
+Para incorporar otra fotografía, guarda su archivo en `photos/`, añade autoría, licencia, fuente y dimensiones a `photos` dentro de la ficha en `data.js` e incluye el archivo en la lista del service worker.
 
 ### Cotejo remoto de las ubicaciones
 
