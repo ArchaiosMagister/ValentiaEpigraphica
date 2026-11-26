@@ -76,10 +76,20 @@ function inscriptionTypes(open = false) {
 
 function renderWelcome() {
   main.innerHTML = `<section class="card welcome">
-    <h2>Ocho inscripciones romanas</h2>
-    <p>Recorre el centro de Valencia, lee cada inscripción en su lugar y responde tres preguntas breves.</p>
-    <button class="primary wide" data-go="route">Empezar recorrido</button>
-    ${inscriptionTypes(true)}
+    <div class="welcome-monument" aria-hidden="true">
+      <div class="welcome-monument-inner">
+        <svg class="welcome-emblem" viewBox="0 0 100 76" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M8 24 50 4 92 24Z M14 29H86 M20 33V62 M40 33V62 M60 33V62 M80 33V62 M14 66H86 M8 72H92"/></svg>
+        <div class="welcome-wordmark">VALENTIA<span>EPIGRAPHICA</span></div>
+      </div>
+    </div>
+    <div class="welcome-cenefa" aria-hidden="true"></div>
+    <div class="welcome-body">
+      <h2>Ocho inscripciones romanas</h2>
+      <p>Recorre el centro de Valencia, lee cada inscripción en su lugar y responde tres preguntas breves.</p>
+      <div class="welcome-facts"><div><strong aria-hidden="true">VIII</strong><span>8 inscripciones</span></div><div><strong aria-hidden="true">IV</strong><span>4 localizaciones</span></div></div>
+      <button class="primary wide" data-go="route">Empezar recorrido</button>
+      ${inscriptionTypes(true)}
+    </div>
   </section>`;
 }
 
