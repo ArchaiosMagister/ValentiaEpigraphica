@@ -40,6 +40,10 @@ jobs:
       - name: Regresiones funcionales
         if: matrix.engine == 'chromium'
         run: node tests/browser.cjs
+      - name: Casos límite de estabilidad
+        env:
+          VE_BROWSER: ${{ matrix.engine }}
+        run: node tests/stability.cjs
       - name: Diseño, fuentes y caché
         env:
           VE_BROWSER: ${{ matrix.engine }}
