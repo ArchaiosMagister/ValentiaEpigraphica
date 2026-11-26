@@ -80,9 +80,9 @@ async function read(page) { return page.evaluate(key => JSON.parse(localStorage.
     await a.evaluate(key => {
       const s = JSON.parse(localStorage.getItem(key));
       const r = s.answers[1], opts = r.questions[0].options;
-      opts.reverse();
-      r.draft[0] = opts.length - 1 - r.draft[0];
-      r.graded[0] = opts.length - 1 - r.graded[0];
+      opts.push(opts.shift());
+      r.draft[0] = (r.draft[0] + opts.length - 1) % opts.length;
+      r.graded[0] = (r.graded[0] + opts.length - 1) % opts.length;
       localStorage.setItem(key,JSON.stringify(s));
     },key);
     await a.reload(); await ready(a);
@@ -128,9 +128,7 @@ async function read(page) { return page.evaluate(key => JSON.parse(localStorage.
     await c.goto(base);
     await c.evaluate(key => localStorage.setItem(key,'{bad JSON'),key);
     await c.reload();
-    await c.locator('#storage-status').getByText(/No se puede garantizar/).waitFor().catch(async () => {
-      await c.getByText(/No se puede garantizar el guardado/).waitFor();
-    });
+    await c.getByText(/No se puede garantizar el guardado/).waitFor();
     await start(c); await grade(c,1);
     assert.equal((await read(c)).answers[1].graded.length,3);
     await c.evaluate(key => localStorage.setItem(key,JSON.stringify({theme:'invalid',answers:{1:{draft:[99,null,-2],graded:[99,null,-2]}}})),key);
@@ -139,7 +137,50 @@ async function read(page) { return page.evaluate(key => JSON.parse(localStorage.
     await c.locator('nav [data-tab=results]').click();
     await wait(c, () => document.querySelector('.score')?.textContent === '0/24');
     await corrupt.close();
-    console.log(engine + ': concurrent tabs, reset, option migration, partial cache, update, failed installation, malformed storage.');
+
+    // A browser that denies access to storage still allows the whole activity.
+    const blocked = await browser.newContext({colorScheme:'light'});
+    await blocked.addInitScript(() => {
+      Object.defineProperty(window,'localStorage',{get(){throw new DOMException('Blocked','SecurityError');}});
+    });
+    const d = await blocked.newPage();
+    await d.goto(base);
+    await d.getByText(/No se puede garantizar el guardado/).waitFor();
+    await start(d); await grade(d,1);
+    await d.locator('nav [data-tab=results]').click();
+    await wait(d, () => document.querySelector('.score')?.textContent === '3/24');
+    await blocked.close();
+    // Deterministic GPS callbacks, including a callback arriving after stop.
+    const geo = await browser.newContext({colorScheme:'light'});
+    await geo.addInitScript(() => {
+      let id = 0;
+      window.gpsFixture = { calls: [], cleared: [] };
+      Object.defineProperty(navigator,'geolocation',{value:{
+        watchPosition(ok,error,options) {
+          window.gpsFixture.calls.push({id:++id,ok,error,options});
+          return id;
+        },
+        clearWatch(id) { window.gpsFixture.cleared.push(id); }
+      }});
+    });
+    const g = await geo.newPage();
+    await g.goto(base); await start(g);
+    await g.locator('#gps').click();
+    assert.equal(await g.evaluate(() => gpsFixture.calls[0].options.enableHighAccuracy),false);
+    await g.evaluate(() => gpsFixture.calls[0].ok({coords:{latitude:39.4732235,longitude:-0.3744353,accuracy:90}}));
+    assert.equal(await g.evaluate(() => gpsFixture.calls[1].options.enableHighAccuracy),true);
+    await g.evaluate(() => gpsFixture.calls[1].ok({coords:{latitude:39.4732235,longitude:-0.3744353,accuracy:2}}));
+    await g.getByText(/A menos de 10 m/).waitFor();
+    await g.locator('#gps').click();
+    await g.evaluate(() => gpsFixture.calls[1].ok({coords:{latitude:39.4732235,longitude:-0.3744353,accuracy:2}}));
+    assert.equal(await g.locator('.map .user').count(),0);
+    assert.equal(await g.locator('#gps').getAttribute('aria-pressed'),'false');
+    await g.locator('#gps').click();
+    await g.evaluate(() => gpsFixture.calls.at(-1).error({code:1}));
+    await g.getByText(/Permiso denegado/).waitFor();
+    assert.equal(await g.locator('#gps').getAttribute('aria-pressed'),'false');
+    await geo.close();
+    console.log(engine + ': concurrent tabs, reset, option migration, partial cache, update, failed installation, malformed/blocked storage, GPS recovery and late callbacks.');
   } finally {
     await browser.close();
     await new Promise(resolve => server.close(resolve));
