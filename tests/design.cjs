@@ -66,6 +66,9 @@ async function theme(page, value) {
       await layout(page, 'welcome ' + value);
       assert.ok(await page.locator('.welcome-wordmark').isVisible());
     }
+    await page.locator('#group-school').selectOption('veles');
+    await page.locator('#group-code').fill('V-123456789ABC');
+    await page.locator('#group-names').fill('Manuel\nAndrea\nJuan');
     await page.getByRole('button', { name: 'Empezar recorrido' }).click();
     for (const value of themes) {
       await theme(page, value);

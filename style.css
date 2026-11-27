@@ -430,3 +430,9 @@ nav button { min-width: 0; min-height: 48px; }
   .welcome-cenefa { display: none; }
   .option:has(input:checked), nav button[aria-current=page] { outline: 2px solid Highlight; }
 }
+
+.group-form,.teacher-form{display:grid;gap:.65rem;text-align:left;margin:1rem 0}.group-form label,.teacher-form label{font-weight:600}.group-form textarea,.group-form select,.teacher-form textarea,.teacher-form input,.result-qr~details textarea{box-sizing:border-box;width:100%;font:inherit;color:inherit;background:transparent;border:1px solid currentColor;border-radius:.5rem;padding:.6rem}.result-qr{background:#fff;padding:.5rem;max-width:340px;margin:1rem auto}.result-qr svg{display:block;width:100%;height:auto}#scan-video{width:100%;max-height:45vh;object-fit:contain;background:#000}.teacher-rank{display:grid;grid-template-columns:1fr auto;gap:.5rem;align-items:center;padding:.65rem 0;border-bottom:1px solid currentColor}.teacher-rank small{display:block}
+
+.group-form input,.teacher-form select{box-sizing:border-box;width:100%;font:inherit;color:inherit;background:transparent;border:1px solid currentColor;border-radius:.5rem;padding:.6rem}.teacher-form[hidden]{display:none}#roster strong{overflow-wrap:anywhere}
+
+#teacher-private[hidden],#teacher-login[hidden],#confirm-password-wrap[hidden],#restore-wrap[hidden]{display:none!important}#teacher-login input{box-sizing:border-box;width:100%;font:inherit;color:inherit;background:transparent;border:1px solid currentColor;border-radius:.5rem;padding:.6rem}#teacher-private>#lock-area{margin-bottom:1rem}
