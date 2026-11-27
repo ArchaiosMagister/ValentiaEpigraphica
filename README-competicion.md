@@ -17,3 +17,6 @@ Usar un único dispositivo. Tras cerrar el registro, buscar grupos por código, 
 
 ## Consulta sin registro
 Desde la portada se puede consultar el itinerario, el GPS opcional, las fotografías, las transcripciones, traducciones y contexto sin registrar un grupo. No aparecen preguntas, progreso, resultados ni QR. No se guarda una sesión de consulta; al recargar se vuelve a la portada. El botón Registrar grupo permite iniciar la actividad normal.
+
+## QR de acceso al alumnado
+El botón Mostrar QR de acceso para el alumnado está disponible en la pantalla docente incluso antes de desbloquearla. El QR contiene exclusivamente la URL pública de la aplicación; no incluye códigos de inscripción ni datos personales. Se genera localmente con la biblioteca ya incluida en la PWA y puede mostrarse sin conexión una vez instalada. No sustituye el registro de grupos ni el QR de resultados.

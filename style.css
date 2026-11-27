@@ -478,3 +478,12 @@ body.presenting{padding-bottom:20px}body.presenting #teacher-main{max-width:920p
 .guide-note{font-size:14px}
 
 .consult-entry{margin:16px 0;padding-top:14px;border-top:1px solid var(--line)}.consult-entry p{margin:0 0 8px}.consultation-banner{border-left:4px solid var(--accent);padding:12px 16px}.consultation-banner p{font-size:14px;margin:5px 0 10px}nav button[hidden]{display:none!important}
+
+.access-qr-tools{margin-bottom:14px}.access-qr-tools button{font-weight:700;color:var(--accent)}
+body.presenting .access-qr-tools{display:none}
+#access-qr-dialog{width:min(580px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;padding:18px;border:1px solid var(--line);border-radius:12px;color:var(--ink);background:var(--paper);text-align:center}
+#access-qr-dialog::backdrop{background:var(--bg)}
+.access-qr-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}.access-qr-head h2{margin:0;font-size:clamp(21px,5vw,28px)}#close-access-qr{min-width:44px;font-size:24px;padding:4px}
+#student-access-qr{width:min(100%,380px);margin:14px auto;background:#fff;line-height:0}#student-access-qr svg{display:block;width:100%;height:auto;aspect-ratio:1}
+.access-qr-url{overflow-wrap:anywhere;font-size:14px;margin-bottom:12px}
+@media print{#access-qr-dialog[open]{position:static;width:100%;max-height:none;border:0}body:has(#access-qr-dialog[open]) header,body:has(#access-qr-dialog[open]) main{display:none!important}}

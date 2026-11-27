@@ -216,4 +216,15 @@ $('show-ranking').onclick=()=>{
 };
 $('exit-ranking').onclick=()=>{hidePresentation();$('presentation-content').replaceChildren();};
 $('print-ranking').onclick=()=>{if(unlocked&&session.closed&&!$('ranking-presentation').hidden)window.print();};
+const accessDialog=$('access-qr-dialog'),accessButton=$('show-access-qr');
+accessButton.onclick=()=>{
+ const qr=qrcode(0,'M');
+ qr.addData('https://archaiosmagister.github.io/ValentiaEpigraphica/');
+ qr.make();
+ $('student-access-qr').innerHTML=qr.createSvgTag({cellSize:8,margin:32,scalable:true});
+ stop();
+ accessDialog.showModal();
+};
+$('close-access-qr').onclick=()=>accessDialog.close();
+accessDialog.addEventListener('close',()=>accessButton.focus({preventScroll:true}));
 showLogin();if('serviceWorker' in navigator&&isSecureContext)navigator.serviceWorker.register('./sw.js').catch(()=>status('No se pudo preparar el uso sin conexión.'));
