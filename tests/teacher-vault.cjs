@@ -12,7 +12,27 @@ const {chromium,webkit}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
  }
  try{
   const context=await browser.newContext(),p=await context.newPage();
-  await p.goto(base);await unlock(p,true);
+  await p.goto(base);
+  await p.locator('#show-access-qr').click();
+  assert.ok(await p.locator('#access-qr-dialog').isVisible());
+  const decoded=await p.evaluate(async()=>{
+   const svg=document.querySelector('#student-access-qr svg');
+   const data=new XMLSerializer().serializeToString(svg);
+   const img=new Image();
+   img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(data);
+   await img.decode();
+   const canvas=document.createElement('canvas');canvas.width=canvas.height=480;
+   const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,480,480);ctx.drawImage(img,0,0,480,480);
+   return jsQR(ctx.getImageData(0,0,480,480).data,480,480)?.data;
+  });
+  assert.equal(decoded,'https://archaiosmagister.github.io/ValentiaEpigraphica/');
+  assert.equal(await p.evaluate(()=>localStorage.getItem('ve-teacher-vault-v1')),null);
+  await p.locator('#close-access-qr').click();
+  assert.equal(await p.locator('#access-qr-dialog').isVisible(),false);
+  await unlock(p,true);
+  await p.locator('#show-access-qr').click();
+  assert.ok(await p.locator('#student-access-qr svg').isVisible());
+  await p.locator('#close-access-qr').click();
   await p.locator('#roster-names').fill('Andrea\nManuel');
   await p.getByRole('button',{name:'Generar código'}).click();
   await p.getByText(/Código generado:/).waitFor();
