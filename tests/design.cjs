@@ -89,7 +89,7 @@ async function theme(page, value) {
       }
       await page.locator('nav [data-tab=results]').click();
       await layout(page, 'results ' + value);
-      assert.equal(await page.locator('.score').textContent(), '0/26');
+      assert.equal(await page.locator('.score').count(),0);
     }
     // WebKit's offline emulation may fail before dispatching navigation to
     // the service worker. In CI, stop the real HTTP origin instead.

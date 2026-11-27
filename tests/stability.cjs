@@ -10,7 +10,7 @@ const root = path.resolve(__dirname, '..');
 const key = 'valentia-epigraphica-v1';
 const engine = process.env.VE_BROWSER || 'chromium';
 const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.webmanifest':'application/manifest+json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.woff2':'font/woff2','.ttf':'font/ttf'};
-let release = '1.0-rc20-area-docente';
+let release = '1.0-rc22-usabilidad';
 let failPhoto = false;
 const server = http.createServer(async (req, res) => {
   try {
@@ -22,7 +22,7 @@ const server = http.createServer(async (req, res) => {
     const file = path.resolve(root, relative);
     if (!file.startsWith(root + path.sep)) { res.writeHead(403).end(); return; }
     let data = await fs.readFile(file);
-    if (relative === 'sw.js') data = data.toString().replace("const release = '1.0-rc20-area-docente';", "const release = '" + release + "';");
+    if (relative === 'sw.js') data = data.toString().replace("const release = '1.0-rc22-usabilidad';", "const release = '" + release + "';");
     res.writeHead(200, {'Content-Type':types[path.extname(file)] || 'application/octet-stream','Cache-Control':'no-store'}).end(data);
   } catch { res.writeHead(404).end(); }
 });
@@ -46,7 +46,8 @@ async function grade(page, id) {
   await open(page, id);
   for (const [i,q] of item.questions.entries()) await page.locator('input[name=q'+i+'][value="'+q.correct+'"]').check();
   await page.locator('#check').click();
-  await wait(page, n => document.querySelectorAll('.feedback.correct:not([hidden])').length === n, item.questions.length);
+  await page.getByText('Respuestas guardadas.',{exact:false}).waitFor();
+  assert.equal(await page.locator('.feedback:not([hidden])').count(),0);
 }
 async function read(page) { return page.evaluate(key => JSON.parse(localStorage.getItem(key) || '{}'), key); }
 (async () => {
@@ -75,12 +76,13 @@ async function read(page) { return page.evaluate(key => JSON.parse(localStorage.
     }, item.questions.map(q => q.correct));
     await Promise.all([activate(a,items[0]),activate(b,items[1])]);
     for (const [p,item] of [[a,items[0]],[b,items[1]]]) {
-      await wait(p,n => document.querySelectorAll('.feedback.correct:not([hidden])').length === n,item.questions.length);
+      await p.getByText('Respuestas guardadas.',{exact:false}).waitFor();
+      assert.equal(await p.locator('.feedback:not([hidden])').count(),0);
       assert.equal(await p.locator('input:checked').count(),item.questions.length);
     }
     await a.locator('nav [data-tab=results]').click();
     await b.locator('nav [data-tab=results]').click();
-    for (const p of [a,b]) await wait(p, () => document.querySelector('.score')?.textContent === '7/26');
+    for (const p of [a,b]) await wait(p, () => document.querySelector('[role=progressbar]')?.getAttribute('aria-valuenow') === '2' && !document.querySelector('.score'));
     const stored = await read(a);
     assert.equal(Object.keys(stored.answers).length,2);
     assert.ok(stored.answers[1].questions.every(q => typeof q.text === 'string'));
@@ -96,7 +98,7 @@ async function read(page) { return page.evaluate(key => JSON.parse(localStorage.
     await a.evaluate(key=>{const s=JSON.parse(localStorage.getItem(key));s.answers={1:s.answers[1]};localStorage.setItem(key,JSON.stringify(s));},key);
     await a.reload();await ready(a);
     await a.locator('nav [data-tab=results]').click();
-    await wait(a, () => document.querySelector('.score')?.textContent === '4/26');
+    await wait(a, () => document.querySelector('[role=progressbar]')?.getAttribute('aria-valuenow') === '1' && !document.querySelector('.score'));
     // Reorder the stored options (not the actual data); migration must map by text.
     await a.evaluate(key => {
       const s = JSON.parse(localStorage.getItem(key));
@@ -104,11 +106,12 @@ async function read(page) { return page.evaluate(key => JSON.parse(localStorage.
       opts.push(opts.shift());
       r.draft[0] = (r.draft[0] + opts.length - 1) % opts.length;
       r.graded[0] = (r.graded[0] + opts.length - 1) % opts.length;
+      r.first[0] = (r.first[0] + opts.length - 1) % opts.length;
       localStorage.setItem(key,JSON.stringify(s));
     },key);
     await a.reload(); await ready(a);
     await a.locator('nav [data-tab=results]').click();
-    await wait(a, () => document.querySelector('.score')?.textContent === '4/26');
+    await wait(a, () => document.querySelector('[role=progressbar]')?.getAttribute('aria-valuenow') === '1' && !document.querySelector('.score'));
     // Detect partial cache and repair it only when the matching release is served.
     failPhoto = true;
     await a.evaluate(async () => {
@@ -123,16 +126,16 @@ async function read(page) { return page.evaluate(key => JSON.parse(localStorage.
     await a.evaluate(() => window.dispatchEvent(new Event('online')));
     await ready(a);
     // Update with a waiting worker, retaining the progress across activation.
-    release = '1.0-rc20-area-docente-fixture-update';
+    release = '1.0-rc22-usabilidad-fixture-update';
     await a.evaluate(async () => (await navigator.serviceWorker.getRegistration()).update());
     await wait(a, async () => !!(await navigator.serviceWorker.getRegistration()).waiting);
     await b.close(); await a.close();
     const next = await context.newPage();
     await next.goto(base); await ready(next);
     await wait(next, async () => (await caches.keys()).some(k => k.endsWith('fixture-update')) &&
-      !(await caches.keys()).some(k => k.endsWith('1.0-rc20-area-docente')));
+      !(await caches.keys()).some(k => k.endsWith('1.0-rc22-usabilidad')));
     await next.locator('nav [data-tab=results]').click();
-    await wait(next, () => document.querySelector('.score')?.textContent === '4/26');
+    await wait(next, () => document.querySelector('[role=progressbar]')?.getAttribute('aria-valuenow') === '1' && !document.querySelector('.score'));
     await context.close();
     // A new installation with an unavailable asset must never claim offline readiness.
     failPhoto = true;
@@ -156,13 +159,13 @@ async function read(page) { return page.evaluate(key => JSON.parse(localStorage.
     await c.reload();
     assert.equal(await c.locator('html').getAttribute('data-theme'),'light');
     await c.locator('nav [data-tab=results]').click();
-    await wait(c, () => document.querySelector('.score')?.textContent === '0/26');
+    await wait(c, () => document.querySelector('[role=progressbar]')?.getAttribute('aria-valuenow') === '0' && !document.querySelector('.score'));
     // Legacy index-only answers for IV.1 must never be silently regraded
     // as the new whole-syntagm question. Retain its other two answers.
     await c.evaluate(key => localStorage.setItem(key,JSON.stringify({group:{id:crypto.randomUUID(),school:'veles',code:'V-123456789ABC',names:['Manuel','Andrea']},started:true,theme:'light',answers:{4:{draft:[1,0,2],graded:[1,0,2]}}})),key);
     await c.reload();
     await c.locator('nav [data-tab=results]').click();
-    await wait(c, () => document.querySelector('.score')?.textContent === '2/26');
+    await wait(c, () => document.querySelector('[role=progressbar]')?.getAttribute('aria-valuenow') === '0' && !document.querySelector('.score'));
     await open(c,4);
     assert.equal(await c.locator('input[name=q0]:checked').count(),0);
     assert.equal(await c.locator('input[name=q3]:checked').count(),0);
@@ -179,7 +182,7 @@ async function read(page) { return page.evaluate(key => JSON.parse(localStorage.
     await d.getByText(/No se puede garantizar el guardado/).waitFor();
     await start(d); await grade(d,1);
     await d.locator('nav [data-tab=results]').click();
-    await wait(d, () => document.querySelector('.score')?.textContent === '4/26');
+    await wait(d, () => document.querySelector('[role=progressbar]')?.getAttribute('aria-valuenow') === '1' && !document.querySelector('.score'));
     await blocked.close();
     // Deterministic GPS callbacks, including a callback arriving after stop.
     const geo = await browser.newContext({colorScheme:'light'});

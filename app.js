@@ -35,6 +35,12 @@ function normalizeAnswers(raw) {
       });
     }
     if (!record.draft && !record.graded) continue;
+    // A submitted first attempt remains the authoritative response after upgrade.
+    if (record.first?.every(Number.isInteger)) {
+      record.graded=record.first.slice();record.draft=record.first.slice();
+    } else if (record.graded?.every(Number.isInteger)) {
+      record.first=record.graded.slice();record.draft=record.graded.slice();
+    }
     record.questions = x.questions.map(q => ({ text: q.text, options: q.options.slice() }));
     valid[x.id] = record;
   }
@@ -176,7 +182,7 @@ window.addEventListener('storage', event => {
   } else storageStatus();
 });
 
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const item=id=>items.find(x=>x.id===id);const complete=x=>Array.isArray(answers[x.id]?.graded)&&x.questions.every((q,i)=>Number.isInteger(answers[x.id].graded[i]));const count=()=>items.filter(complete).length;const points=x=>x.questions.filter((q,i)=>q.correct===answers[x.id]?.graded?.[i]).length;const score=()=>items.reduce((sum,x)=>sum+points(x),0);const totalQuestions=items.reduce((sum,x)=>sum+x.questions.length,0);const zones=[1,2,3,4].map(id=>item(id));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const item=id=>items.find(x=>x.id===id);const complete=x=>Array.isArray(answers[x.id]?.graded)&&x.questions.every((q,i)=>Number.isInteger(answers[x.id].graded[i]));const count=()=>items.filter(complete).length;const points=x=>x.questions.filter((q,i)=>q.correct===answers[x.id]?.graded?.[i]).length;const score=()=>items.reduce((sum,x)=>sum+points(x),0);const finished=()=>activities.every(complete);const totalQuestions=items.reduce((sum,x)=>sum+x.questions.length,0);const zones=[1,2,3,4].map(id=>item(id));
 function hav(a,b,c,d){const r=Math.PI/180,h=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 6371000*2*Math.asin(Math.sqrt(Math.min(1,h)))}
 function proximity(x) {
   if (!position) return 'Ubicación sin señal';
@@ -245,7 +251,7 @@ function renderWelcome() {
       <div class="welcome-facts"><div><strong aria-hidden="true">VIII</strong><span>8 inscripciones</span></div><div><strong aria-hidden="true">IV</strong><span>4 localizaciones</span></div></div>
       <form id="group-form" class="group-form">
 <h3>Registro del grupo</h3><label for="group-school">Instituto</label><select id="group-school" required><option value="">Selecciona tu instituto</option>${Object.entries(competition.schools).map(([id,name])=>`<option value="${id}">${esc(name)}</option>`).join('')}</select>
-<label for="group-code">Código de inscripción del profesor</label><input id="group-code" required maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="V-XXXXXXXXXXXX"><label for="group-names">Nombres de los miembros (uno por línea, de 2 a 6)</label><textarea id="group-names" rows="4" required placeholder="Manuel&#10;Andrea&#10;Juan" maxlength="260"></textarea><p class="muted">Solo nombres de pila. Se guardarán en este dispositivo y en el del profesor al entregar el resultado. Introduce exactamente los nombres registrados por el profesor. El código se comprobará al entregar el QR. Se puntúan las primeras respuestas comprobadas.</p>
+<label for="group-code">Código de inscripción del profesor</label><input id="group-code" required maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="V7K4MX9A"><label for="group-names">Nombres de los miembros (uno por línea, de 2 a 6)</label><textarea id="group-names" rows="4" required placeholder="Manuel&#10;Andrea&#10;Juan" maxlength="260"></textarea><p class="muted">Solo nombres de pila. Se guardarán en este dispositivo y en el del profesor al entregar el resultado. Introduce exactamente los nombres registrados por el profesor. El código se comprobará al entregar el QR. Al enviar las respuestas de una inscripción quedarán guardadas. La corrección y la puntuación solo se mostrarán tras completar todas las actividades.</p>
 ${Object.keys(answers).length ? '<p class="note">El progreso anterior al registro no cuenta para la clasificación. Al comenzar se sustituirá por una actividad nueva.</p>' : ''}
 <p id="group-error" role="alert"></p><button class="primary wide" type="submit">Empezar recorrido</button></form>
       ${inscriptionTypes(true)}
@@ -299,7 +305,7 @@ function transcription(item) {
 
 function quizMarkup(x) {
   const draft = answers[x.id]?.draft || [];
-  return `<form class="card" id="quiz"><h3>${x.id === recap.id ? "Preguntas de recapitulación" : "Actividades"}</h3>${x.questions.map((q,i)=>`<fieldset class="question"><legend>${i+1}. ${formatLatinTerms(q.text)}</legend>${competition.optionOrder(state.group.code,x.id,i,q.options.length).map(j=>`<label class="option"><input type="radio" name="q${i}" value="${j}" ${draft[i]===j?'checked':''}><span>${esc(q.options[j])}</span></label>`).join('')}<p class="feedback" hidden></p></fieldset>`).join('')}<button class="primary wide" id="check" type="submit" ${x.questions.every((q,i)=>Number.isInteger(draft[i]))?'':'disabled'}>Comprobar respuestas</button><p class="done quiz-result" role="status"></p></form>`;
+  return `<form class="card" id="quiz"><h3>${x.id === recap.id ? "Preguntas de recapitulación" : "Actividades"}</h3>${x.questions.map((q,i)=>`<fieldset class="question"><legend>${i+1}. ${formatLatinTerms(q.text)}</legend>${competition.optionOrder(state.group.code,x.id,i,q.options.length).map(j=>`<label class="option"><input type="radio" name="q${i}" value="${j}" ${draft[i]===j?'checked':''} ${complete(x)?'disabled':''}><span>${esc(q.options[j])}</span></label>`).join('')}<p class="feedback" hidden></p></fieldset>`).join('')}<button class="primary wide" id="check" type="submit" ${!complete(x)&&x.questions.every((q,i)=>Number.isInteger(draft[i]))?'':'disabled'}>${complete(x)?'Respuestas enviadas':'Enviar respuestas'}</button><p class="done quiz-result" role="status"></p></form>`;
 }
 function renderDetail(){const x=item(selected);const {closeup,setting}=inscriptionPhotos(x);main.innerHTML=`<button class="back" data-go="list">‹ Todas las inscripciones</button><p class="muted" id="completion-status">${x.roman} · ${complete(x) ? "Actividad completada" : "Actividad pendiente"}</p><h2>${esc(x.title)}</h2><p class="muted">${esc(x.street)} · ${esc(x.date)}</p><div class="card"><div class="row"><strong data-distance="${x.id}">${proximity(x)}</strong><button id="gps" aria-pressed="${watch !== null}">${watch!==null?'Desactivar GPS':'Activar GPS'}</button></div><p id="gps-status" class="muted" role="status">${esc(gpsMessage)}</p><p class="muted">${esc(x.locationHint)}</p><p><a href="${esc(x.streetView)}" target="_blank" rel="noopener noreferrer">Ver la fachada en Street View</a></p><div class="inscription-display inscription-display--${esc(x.frame)}">${closeup}${transcription(x)}</div><details class="inscription-translation"><summary>Traducción</summary><p>${esc(x.translation)}</p></details><details><summary>Contexto histórico</summary><p>${formatLatinTerms(x.context)}</p></details>${setting}</div>${quizMarkup(x)}<div class="actions">${x.id>1?`<button data-open="${x.id-1}">‹ Anterior</button>`:''}${x.id<8?`<button class="next-inscription" data-open="${x.id+1}">Siguiente inscripción · ${item(x.id+1).roman}</button>`:`<button data-go="results">Ver resultados ›</button>`}</div>`;
   attachQuiz(x);
@@ -331,19 +337,24 @@ function attachQuiz(x) {
   const nextButton = main.querySelector('.next-inscription');
 
   function showFeedback(gradedAnswers) {
+    const submitted=complete(x);
+    if(!finished())gradedAnswers=null;
+    for(const input of form.querySelectorAll('input[type=radio]'))input.disabled=submitted;
+    check.textContent=submitted?'Respuestas enviadas':'Enviar respuestas';
+    check.disabled=submitted||!visibleAnswers().every(Number.isInteger);
     for (const [i, message] of feedback.entries()) {
       const question = x.questions[i];
       const correct = gradedAnswers?.[i] === question.correct;
       message.hidden = !gradedAnswers;
-      message.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
+      message.className = gradedAnswers ? 'feedback ' + (correct ? 'correct' : 'incorrect') : 'feedback';
       message.innerHTML = gradedAnswers
         ? (correct ? 'Correcto. ' : 'Respuesta incorrecta. ') + formatLatinTerms(question.explanation)
         : '';
     }
     result.textContent = gradedAnswers
       ? x.questions.filter((q, i) => q.correct === gradedAnswers[i]).length + '/' + x.questions.length + ' respuestas correctas'
-      : '';
-    nextButton?.classList.toggle('primary', Boolean(gradedAnswers));
+      : submitted?'Respuestas guardadas. La corrección se mostrará al terminar todas las actividades.':'';
+    nextButton?.classList.toggle('primary', submitted);
   }
 
   function visibleAnswers() {
@@ -357,7 +368,8 @@ function attachQuiz(x) {
   syncDetail = () => {
     const current = answers[x.id] || {};
     const fingerprint = JSON.stringify(current);
-    if (fingerprint === renderedRecord) return;
+    // Completion of a different activity can unlock the final correction.
+    if (fingerprint === renderedRecord) {showFeedback(complete(x)?current.graded:null);return;}
     renderedRecord = fingerprint;
     const values = x.questions.map((q, i) => current.draft?.[i] ?? null);
     const visible = visibleAnswers();
@@ -366,7 +378,7 @@ function attachQuiz(x) {
     // when a different tab is also committing progress. Never overwrite
     // an in-flight local choice with a previous persisted snapshot.
     for (const [i, value] of values.entries()) {
-      if (value === renderedDraft[i] || value === visible[i] || visible[i] !== renderedDraft[i]) continue;
+      if (value === visible[i] || (!complete(x) && (value === renderedDraft[i] || visible[i] !== renderedDraft[i]))) continue;
       const inputs = form.querySelectorAll('input[name=q' + i + ']');
       if (value === null) inputs.forEach(input => { input.checked = false; });
       else {
@@ -384,6 +396,7 @@ function attachQuiz(x) {
   };
   showFeedback(graded ? draft : null);
   form.addEventListener('change', event => {
+    if(complete(x))return;
     const i = Number(event.target.name.slice(1));
     const value = Number(event.target.value);
     if (!x.questions[i] || !Number.isInteger(value) || value < 0 || value >= x.questions[i].options.length) return;
@@ -392,18 +405,21 @@ function attachQuiz(x) {
     void persist('answer', next => {
       if (x.id === recap.id && !recapUnlocked(next.answers)) return;
       const record = answerRecord(next, x);
+      if(record.first?.every(Number.isInteger))return;
       (record.draft ||= Array(x.questions.length).fill(null))[i] = value;
       next.started = true;
     });
   });
   form.addEventListener('submit', event => {
     event.preventDefault();
+    if(complete(x))return;
     const values = visibleAnswers();
     if (!values.every((value, i) => Number.isInteger(value) && value >= 0 && value < x.questions[i].options.length)) return;
     // Grade precisely the choices the pupil saw on submitting.
     void persist('answer', next => {
       if (x.id === recap.id && !recapUnlocked(next.answers)) return;
       const record = answerRecord(next, x);
+      if(record.first?.every(Number.isInteger))return;
       record.draft = values.slice();
       record.graded = values.slice();
       if (!record.first?.every(Number.isInteger)) record.first = values.slice();
@@ -416,7 +432,7 @@ function recapCard() {
   const unlocked = recapUnlocked();
   return `<div class="card" id="recap-card"><h3>Recapitulación final</h3>
     ${unlocked ? `<p>${complete(recap) ? 'Recapitulación completada.' : 'Cinco preguntas filológicas para terminar la actividad.'}</p>
-      <p class="muted">Puntuación de recapitulación: <strong id="recap-score">${points(recap)}/${recap.questions.length}</strong></p>
+      ${finished()?'<p class="muted">Puntuación de recapitulación: <strong id="recap-score">'+points(recap)+'/'+recap.questions.length+'</strong></p>':''}
       <button class="primary wide" data-go="recap">${complete(recap) ? 'Revisar recapitulación' : 'Hacer recapitulación'}</button>`
       : '<p class="muted">Se desbloquea al completar las ocho inscripciones.</p>'}</div>`;
 }
@@ -426,10 +442,10 @@ function competitionCard(){
  if(!activities.every(complete))return header+'<p>Completa las ocho inscripciones y la recapitulación para obtener el QR.</p></div>';
  try{
   const code=competition.encode(g,answers),result=competition.decode(code),qr=qrcode(0,'M');qr.addData(code);qr.make();
-  return header+'<p>Puntuación de clasificación (primer intento): <strong>'+result.score+'/'+competition.total+'</strong></p><div class="result-qr" id="result-qr">'+qr.createSvgTag({cellSize:4,margin:16,scalable:true})+'</div><p>Enseña este código al profesor. Las correcciones posteriores no cambian la clasificación.</p><details><summary>Código de respaldo</summary><textarea readonly aria-label="Código de resultado">'+esc(code)+'</textarea></details></div>';
+  return header+'<p>Puntuación de clasificación (primer intento): <strong>'+result.score+'/'+competition.total+'</strong></p><div class="result-qr" id="result-qr">'+qr.createSvgTag({cellSize:4,margin:16,scalable:true})+'</div><p><strong>Entrega del resultado.</strong> Enseña el QR al profesor con el brillo de la pantalla alto y espera su confirmación. Puedes volver a esta pantalla cuando lo necesites, incluso sin conexión.</p><details><summary>Si la cámara no lee el QR</summary><p>Enseña el código de respaldo al profesor o copia el texto.</p><textarea readonly id="result-code" aria-label="Código de resultado">'+esc(code)+'</textarea><button type="button" id="copy-result" class="wide">Copiar código de resultado</button><p role="status" id="copy-status"></p></details></div>';
  }catch(e){return header+'<p role="alert">No se ha podido generar el código: '+esc(e.message)+'</p></div>';}
 }
-function renderResults(){main.innerHTML=`<h2>Resultados</h2><div class="card">${progress()}<p class="muted">Puntuación (últimas respuestas comprobadas)</p><div class="score">${score()}/${totalQuestions}</div><p>${count()===8?'Ocho inscripciones completadas.':'Puedes continuar en cualquier momento.'}</p></div>${recapCard()}<div class="card">${items.map(x=>`<div class="zone"><button data-open="${x.id}">${x.roman}. ${esc(x.title)}</button><strong>${answers[x.id]?.graded?.some(Number.isInteger)?points(x)+'/'+x.questions.length:'—'}</strong></div>`).join('')}</div>${competitionCard()}`}
+function renderResults(){main.innerHTML=`<h2>Resultados</h2>${finished()?competitionCard():''}<div class="card">${progress()}${finished()?'<p class="muted">Puntuación de las inscripciones</p><div class="score">'+score()+'/'+totalQuestions+'</div>':'<p class="muted" id="pending-correction">La puntuación y la corrección se mostrarán al completar las ocho inscripciones y la recapitulación.</p>'}<p>${count()===8?'Ocho inscripciones completadas.':'Puedes continuar en cualquier momento.'}</p></div>${recapCard()}<div class="card">${items.map(x=>`<div class="zone"><button data-open="${x.id}">${x.roman}. ${esc(x.title)}</button><strong>${finished()?points(x)+'/'+x.questions.length:complete(x)?'Entregada':'Pendiente'}</strong></div>`).join('')}</div>${finished()?'':competitionCard()}`}
 function render(){syncDetail=null;document.querySelector("nav").hidden=tab==="welcome";document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===(tab==='detail'?'list':tab==='recap'?'results':tab)?'page':'false'));({welcome:renderWelcome,route:renderRoute,list:renderList,detail:renderDetail,recap:renderRecap,results:renderResults}[tab])();if(!storageOK)document.querySelector('#storage-status').textContent='No se pudo acceder al progreso guardado en este dispositivo.'}
 async function go(t, id) {
   if (t === 'recap' && !recapUnlocked()) return;
@@ -507,6 +523,7 @@ function startGPS() {
   beginWatch(false);
 }
 document.addEventListener('click', event => {
+  if(event.target.closest('#copy-result')){const field=document.querySelector('#result-code'),message=document.querySelector('#copy-status');if(!field)return;field.focus();field.select();if(navigator.clipboard?.writeText){navigator.clipboard.writeText(field.value).then(()=>{message.textContent='Código copiado.';}).catch(()=>{message.textContent='Texto seleccionado. Usa Copiar en el menú del dispositivo.';});}else message.textContent='Texto seleccionado. Usa Copiar en el menú del dispositivo.';return;}
   const b = event.target.closest('button');
   if (!b) return;
   if (b.dataset.tab) void go(b.dataset.tab);

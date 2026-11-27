@@ -5,10 +5,19 @@ globalThis.VE_COMP=(()=>{
  const bank=JSON.stringify(activities.map(x=>[x.id,x.questions.map(q=>[q.text,q.options,q.correct])]));
  let h=2166136261;for(let i=0;i<bank.length;i++)h=Math.imul(h^bank.charCodeAt(i),16777619);
  const fingerprint=(h>>>0).toString(36);
- function codeFor(school,code){return typeof code==='string'&&Object.hasOwn(schools,school)&&new RegExp('^'+(school==='veles'?'V':'O')+'-[A-F0-9]{12}$').test(code);}
+ const alphabet='ACDEFHJKMNPQRTUVWXY3479';
+ function codeFor(school,code){
+  if(typeof code!=='string'||!Object.hasOwn(schools,school))return false;
+  const prefix=school==='veles'?'V':'M';
+  // Preserve registrations and encrypted backups from the previous release.
+  return new RegExp('^'+prefix+'['+alphabet+']{7}$').test(code)||new RegExp('^'+(school==='veles'?'V':'O')+'-[A-F0-9]{12}$').test(code);
+ }
  function makeCode(school){
   if(!Object.hasOwn(schools,school))throw Error('Centro inválido.');
-  return (school==='veles'?'V':'O')+'-'+Array.from(crypto.getRandomValues(new Uint8Array(6)),b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
+  let code=school==='veles'?'V':'M';
+  const limit=256-256%alphabet.length;
+  while(code.length<8){const n=crypto.getRandomValues(new Uint8Array(1))[0];if(n<limit)code+=alphabet[n%alphabet.length];}
+  return code;
  }
  const namesKey=names=>JSON.stringify(names.map(n=>n.toLocaleLowerCase('es')).sort());
  function optionOrder(code,id,index,n){
