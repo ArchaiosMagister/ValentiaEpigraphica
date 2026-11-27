@@ -10,7 +10,7 @@ const root = path.resolve(__dirname, '..');
 const key = 'valentia-epigraphica-v1';
 const engine = process.env.VE_BROWSER || 'chromium';
 const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.webmanifest':'application/manifest+json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.woff2':'font/woff2','.ttf':'font/ttf'};
-let release = '1.0-rc22-usabilidad';
+let release = '1.0-rc24-consulta';
 let failPhoto = false;
 const server = http.createServer(async (req, res) => {
   try {
@@ -22,7 +22,7 @@ const server = http.createServer(async (req, res) => {
     const file = path.resolve(root, relative);
     if (!file.startsWith(root + path.sep)) { res.writeHead(403).end(); return; }
     let data = await fs.readFile(file);
-    if (relative === 'sw.js') data = data.toString().replace("const release = '1.0-rc22-usabilidad';", "const release = '" + release + "';");
+    if (relative === 'sw.js') data = data.toString().replace("const release = '1.0-rc24-consulta';", "const release = '" + release + "';");
     res.writeHead(200, {'Content-Type':types[path.extname(file)] || 'application/octet-stream','Cache-Control':'no-store'}).end(data);
   } catch { res.writeHead(404).end(); }
 });
@@ -126,14 +126,14 @@ async function read(page) { return page.evaluate(key => JSON.parse(localStorage.
     await a.evaluate(() => window.dispatchEvent(new Event('online')));
     await ready(a);
     // Update with a waiting worker, retaining the progress across activation.
-    release = '1.0-rc22-usabilidad-fixture-update';
+    release = '1.0-rc24-consulta-fixture-update';
     await a.evaluate(async () => (await navigator.serviceWorker.getRegistration()).update());
     await wait(a, async () => !!(await navigator.serviceWorker.getRegistration()).waiting);
     await b.close(); await a.close();
     const next = await context.newPage();
     await next.goto(base); await ready(next);
     await wait(next, async () => (await caches.keys()).some(k => k.endsWith('fixture-update')) &&
-      !(await caches.keys()).some(k => k.endsWith('1.0-rc22-usabilidad')));
+      !(await caches.keys()).some(k => k.endsWith('1.0-rc24-consulta')));
     await next.locator('nav [data-tab=results]').click();
     await wait(next, () => document.querySelector('[role=progressbar]')?.getAttribute('aria-valuenow') === '1' && !document.querySelector('.score'));
     await context.close();

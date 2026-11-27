@@ -19,7 +19,7 @@ async function layout(page, label) {
     const result = await page.evaluate(() => ({
       viewport: innerWidth,
       root: document.documentElement.scrollWidth,
-      controls: [...document.querySelectorAll('nav:not([hidden]) button, #theme')].map(e => {
+      controls: [...document.querySelectorAll('nav:not([hidden]) button, #theme, #how-it-works')].map(e => {
         const r = e.getBoundingClientRect();
         return { width: r.width, height: r.height, left: r.left, right: r.right };
       }),
@@ -65,7 +65,37 @@ async function theme(page, value) {
       await theme(page, value);
       await layout(page, 'welcome ' + value);
       assert.ok(await page.locator('.welcome-wordmark').isVisible());
+      await page.locator('#how-it-works').click();
+      assert.equal(await page.locator('#student-guide').isVisible(),true);
+      assert.equal(await page.locator('[data-stage=register]').getAttribute('aria-current'),'step');
+      for(const width of widths){
+        await page.setViewportSize({width,height:650});
+        assert.ok(await page.locator('#student-guide').evaluate(e=>e.getBoundingClientRect().width<=innerWidth&&e.getBoundingClientRect().height<=innerHeight));
+      }
+      await page.locator('#close-guide').click();
+      assert.equal(await page.locator('#student-guide').isVisible(),false);
     }
+    const original=await page.evaluate(()=>localStorage.getItem('valentia-epigraphica-v1'));
+    await page.locator('#consult-start').click();
+    assert.ok(await page.locator('#map').isVisible());
+    assert.equal(await page.locator('nav [data-tab=results]').isVisible(),false);
+    assert.equal(await page.locator('[role=progressbar]').count(),0);
+    await page.locator('nav [data-tab=list]').click();
+    assert.equal(await page.locator('.list-item').count(),8);
+    for(const item of globalThis.VE_DATA.items){
+      await page.locator('.list-item[data-open="'+item.id+'"]').click();
+      assert.ok(await page.locator('#latin-text').isVisible());
+      assert.equal(await page.locator('#quiz').count(),0);
+      assert.equal(await page.locator('#check').count(),0);
+      assert.equal(await page.locator('#result-qr').count(),0);
+      await page.locator('nav [data-tab=list]').click();
+    }
+    await page.locator('#how-it-works').click();
+    assert.match(await page.locator('#guide-current').textContent(),/consultad el mapa/);
+    await page.locator('#close-guide').click();
+    await page.locator('#consult-register').click();
+    assert.equal(await page.evaluate(()=>localStorage.getItem('valentia-epigraphica-v1')),original);
+    assert.ok(await page.locator('#group-form').isVisible());
     await page.locator('#group-school').selectOption('veles');
     await page.locator('#group-code').fill('V-123456789ABC');
     await page.locator('#group-names').fill('Manuel\nAndrea\nJuan');
@@ -79,7 +109,7 @@ async function theme(page, value) {
       await layout(page, 'list ' + value);
       for (const item of globalThis.VE_DATA.items) {
         await page.locator('.list-item[data-open="' + item.id + '"]').click();
-        assert.equal(await page.locator('h2').textContent(), item.title);
+        assert.equal(await page.locator('#main h2').textContent(), item.title);
         assert.deepEqual(await page.locator('#latin-text pre').allTextContents(), item.latin.split('\n\n'));
         assert.equal(await page.locator('#latin-text pre').first().evaluate(e => getComputedStyle(e).whiteSpace), 'pre');
         await layout(page, 'inscription ' + item.id + ' ' + value);
