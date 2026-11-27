@@ -58,7 +58,7 @@ require('../data.js');
     await page.locator('nav [data-tab=list]').click();
     for (const item of items) {
       await page.locator('.list-item[data-open="' + item.id + '"]').click();
-      assert.equal(await page.locator('h2').textContent(), item.title);
+      assert.equal(await page.locator('#main h2').textContent(), item.title);
       assert.equal(await page.locator('fieldset').count(), item.questions.length);
       assert.match(await page.locator('legend').nth(2).textContent(), /¿Ante qué tipo de inscripción estamos\?/);
       const fields = page.locator('#latin-text pre');

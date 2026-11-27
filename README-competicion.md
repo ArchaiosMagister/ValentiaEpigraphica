@@ -14,3 +14,6 @@ Las respuestas de cada ficha se envían una sola vez. Hasta completar las ocho f
 
 ## Operativa docente
 Usar un único dispositivo. Tras cerrar el registro, buscar grupos por código, nombre o centro y filtrar pendientes, entregados o excluidos. La cámara permite escanear consecutivamente; retirar cada QR tras la confirmación. Una incidencia documentada puede excluir solo un grupo sin resultado; se puede reincorporar antes del cierre. No se contabiliza como cero ni en la media del instituto. El cierre exige al menos un resultado y ningún grupo pendiente. Descargar copia cifrada antes y después del cierre. La presentación final oculta los controles, códigos y motivos de incidencias; imprimir o guardar como PDF desde el navegador solo si se desea conservar una copia con nombres y puntuaciones no cifrados. Las copias cifradas anteriores sin incidencias siguen siendo compatibles. El alumno puede mostrar el QR de nuevo o copiar el código alternativo; no hay acuse de recibo automático entre dispositivos.
+
+## Consulta sin registro
+Desde la portada se puede consultar el itinerario, el GPS opcional, las fotografías, las transcripciones, traducciones y contexto sin registrar un grupo. No aparecen preguntas, progreso, resultados ni QR. No se guarda una sesión de consulta; al recargar se vuelve a la portada. El botón Registrar grupo permite iniciar la actividad normal.
