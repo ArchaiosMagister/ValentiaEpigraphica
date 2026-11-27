@@ -1,7 +1,9 @@
 'use strict';
-const C=VE_COMP,key='ve-teacher-vault-v1',$=id=>document.getElementById(id),status=m=>{$('teacher-status').textContent=m;};
+const C=VE_COMP,key='ve-teacher-vault-v1',$=id=>document.getElementById(id),status=(m,kind='')=>{const el=$('teacher-status');el.textContent=m;el.dataset.kind=kind;};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const empty=()=>({roster:[],records:[],sealed:false,closed:false});
+const empty=()=>({roster:[],records:[],excluded:[],sealed:false,closed:false});
+const pending=s=>s.roster.length-s.records.length-s.excluded.length;
+const canClose=s=>s.sealed&&!s.closed&&s.records.length>0&&pending(s)===0;
 let session=empty(), storedRaw=null, vaultKey=null, salt=null, unlocked=false, busy=false, lockPending=false, epoch=0, idleTimer=null, lastActivity=0;
 let loadFailed=false;
 const idleMs=5*60*1000;
@@ -10,9 +12,15 @@ function checkSession(raw){
  const roster=raw.roster.map(g=>{const v=C.group(g);if(!v)throw Error('Grupo inválido.');return v;});
  const records=raw.records.map(C.validate);
  if(new Set(roster.map(g=>g.code)).size!==roster.length||new Set(roster.map(g=>g.id)).size!==roster.length||new Set(roster.map(g=>g.school+':'+C.namesKey(g.names))).size!==roster.length)throw Error('Registro duplicado.');
- if((records.length&&!raw.sealed)||(raw.sealed&&!roster.length)||(raw.closed&&(!raw.sealed||records.length!==roster.length)))throw Error('Estado inválido.');
+ const source=raw.excluded===undefined?[]:raw.excluded;
+ if(!Array.isArray(source))throw Error('Incidencias inválidas.');
+ const excluded=source.map(x=>{
+  if(!x||!roster.some(g=>g.code===x.code)||typeof x.reason!=='string'||!x.reason.trim()||x.reason.length>300||typeof x.at!=='string'||!Number.isFinite(Date.parse(x.at))||records.some(r=>r.code===x.code))throw Error('Incidencia inválida.');
+  return {code:x.code,reason:x.reason.trim(),at:x.at};
+ });
+ if(new Set(excluded.map(x=>x.code)).size!==excluded.length||((records.length||excluded.length)&&!raw.sealed)||(raw.sealed&&!roster.length)||(raw.closed&&(!raw.sealed||!records.length||records.length+excluded.length!==roster.length)))throw Error('Estado inválido.');
  const accepted=[];for(const r of records){C.admit(roster,accepted,r);accepted.push(r);}
- return {roster,records,sealed:raw.sealed,closed:raw.closed};
+ return {roster,records,excluded,sealed:raw.sealed,closed:raw.closed};
 }
 function loginStatus(m){$('login-status').textContent=m;}
 function showLogin(){
@@ -31,7 +39,7 @@ function lock(){
  if(!unlocked)return;
  if(busy){lockPending=true;return;}
  epoch++;unlocked=false;vaultKey=null;salt=null;session=empty();clearTimeout(idleTimer);idleTimer=null;
- stop();$('roster').replaceChildren();$('groups').replaceChildren();$('schools').replaceChildren();
+ stop();hidePresentation();$('presentation-content').replaceChildren();$('roster-count').textContent='';$('roster-search').value='';$('roster-filter').value='all';$('roster').replaceChildren();$('groups').replaceChildren();$('schools').replaceChildren();
  for(const id of ['roster-status','teacher-status','completion-summary'])$(id).textContent='';
  for(const id of ['roster-names','scan-text','scan-file'])$(id).value='';
  $('roster-school').selectedIndex=0;
@@ -92,8 +100,9 @@ async function add(code){
  if(!unlocked||busy)return;
  try{if(!session.sealed)throw Error('Cierra primero el registro de grupos.');
  const r=C.admit(session.roster,session.records,C.decode(code.trim()),session.closed);
- if(await save({...session,records:[...session.records,r]})&&unlocked)status('Resultado recibido: '+r.names.join(', ')+'.');
- }catch(e){status('No se ha importado: '+e.message);}
+ if(session.excluded.some(x=>x.code===r.code))throw Error('Grupo excluido por incidencia. Reincorpóralo antes de registrar su resultado.');
+ if(await save({...session,records:[...session.records,r]})&&unlocked){touch();status('Resultado recibido: '+r.names.join(', ')+'.','success');if(pending(session)===0)stop();return true;}
+ }catch(e){status('No se ha importado: '+e.message,'error');}return false;
 }
 $('roster-form').onsubmit=async e=>{
  e.preventDefault();if(!unlocked||busy||session.sealed||loadFailed)return;
@@ -104,19 +113,47 @@ $('roster-form').onsubmit=async e=>{
  if(session.roster.some(r=>r.school===school&&C.namesKey(r.names)===C.namesKey(g.names))){$('roster-status').textContent='Ese grupo ya está registrado.';return;}
  if(await save({...session,roster:[...session.roster,g]})&&unlocked){$('roster-names').value='';$('roster-status').textContent='Código generado: '+code;}
 };
-$('roster').onclick=e=>{const id=e.target.dataset.removeRoster;if(unlocked&&!busy&&id&&!session.sealed&&confirm('¿Retirar este grupo del registro previo?'))save({...session,roster:session.roster.filter(g=>g.id!==id)});};
+$('roster').onclick=e=>{
+ if(!unlocked||busy||session.closed)return;
+ const id=e.target.dataset.removeRoster,code=e.target.dataset.exclude,restore=e.target.dataset.reinstate;
+ if(id&&!session.sealed&&confirm('¿Retirar este grupo del registro previo?')){void save({...session,roster:session.roster.filter(g=>g.id!==id)});return;}
+ if(!session.sealed)return;
+ if(code&&session.roster.some(g=>g.code===code)&&!session.records.some(g=>g.code===code)&&!session.excluded.some(x=>x.code===code)){
+  const reason=prompt('Motivo de la exclusión (ausencia, incidencia técnica, etc.). No contará en la clasificación.');
+  if(reason===null)return;
+  if(!reason.trim()||reason.trim().length>300){$('roster-status').textContent='Escribe un motivo válido de hasta 300 caracteres.';return;}
+  if(confirm('¿Excluir este grupo de la clasificación? Podrás reincorporarlo antes del cierre.'))void save({...session,excluded:[...session.excluded,{code,reason:reason.trim(),at:new Date().toISOString()}]});
+ }else if(restore&&session.excluded.some(x=>x.code===restore)&&confirm('¿Reincorporar el grupo al registro de pendientes?'))void save({...session,excluded:session.excluded.filter(x=>x.code!==restore)});
+};
 $('seal-roster').onclick=()=>{if(unlocked&&!busy&&!session.sealed&&session.roster.length&&confirm('¿Cerrar el registro? No podrás añadir más grupos.'))save({...session,sealed:true});};
-$('close-ranking').onclick=()=>{if(unlocked&&!busy&&session.sealed&&!session.closed&&session.records.length===session.roster.length&&confirm('¿Cerrar definitivamente la clasificación?'))save({...session,closed:true});};
+$('close-ranking').onclick=()=>{if(unlocked&&!busy&&canClose(session)&&confirm('¿Cerrar definitivamente la clasificación? Se han recibido '+session.records.length+' resultados y hay '+session.excluded.length+' grupos excluidos. Guarda una copia cifrada antes de cerrar.')){stop();void save({...session,closed:true});}};
 window.addEventListener('storage',e=>{if(e.key===key||e.key===null){if(unlocked)lock();else showLogin();loginStatus('Los datos cambiaron en otra pestaña. Vuelve a acceder.');}});
+function renderRoster(){
+ const {roster,records,excluded,sealed,closed}=session;
+ const normalize=s=>s.toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+ const query=normalize($('roster-search').value.trim()),filter=$('roster-filter').value;
+ let shown=0;
+ $('roster').innerHTML=roster.map(g=>{
+  const received=records.some(r=>r.code===g.code),incident=excluded.find(x=>x.code===g.code),state=received?'received':incident?'absent':'pending';
+  if(filter!=='all'&&filter!==state)return '';
+  if(query&&!normalize([g.code,...g.names,C.schools[g.school]].join(' ')).includes(query))return '';
+  shown++;
+  const action=!sealed?'<button data-remove-roster="'+esc(g.id)+'">Retirar grupo</button>':closed||received?'':incident?'<button data-reinstate="'+esc(g.code)+'">Reincorporar</button>':'<button data-exclude="'+esc(g.code)+'">Registrar incidencia</button>';
+  return '<div class="teacher-rank roster-entry"><div><strong>'+esc(g.code)+'</strong><small>'+g.names.map(esc).join(', ')+' · '+esc(C.schools[g.school])+'</small>'+(incident?'<small>Motivo: '+esc(incident.reason)+'</small>':'')+'</div><span class="roster-state" data-state="'+state+'">'+(received?'Recibido':incident?'Excluido':'Pendiente')+'</span>'+action+'</div>';
+ }).join('')||'<p>'+ (roster.length?'No hay grupos que coincidan.':'No hay grupos registrados.')+'</p>';
+ $('roster-count').textContent=shown+' de '+roster.length+' grupos · '+records.length+' entregados · '+pending(session)+' pendientes · '+excluded.length+' excluidos';
+}
+$('roster-search').oninput=renderRoster;$('roster-filter').onchange=renderRoster;
 function render(){
- const {roster,records,sealed,closed}=session;
- $('roster').innerHTML=roster.map(g=>'<div class="teacher-rank"><div><strong>'+esc(g.code)+'</strong><small>'+g.names.map(esc).join(', ')+' · '+esc(C.schools[g.school])+'</small></div><span>'+(records.some(r=>r.code===g.code)?'Recibido':'Pendiente')+'</span>'+(!sealed?'<button data-remove-roster="'+esc(g.id)+'">Retirar grupo</button>':'')+'</div>').join('')||'<p>No hay grupos registrados.</p>';
+ const {roster,records,excluded,sealed,closed}=session;
+ renderRoster();
  $('roster-form').hidden=sealed;
  $('seal-roster').disabled=sealed||!roster.length||loadFailed;
  $('seal-roster').textContent=sealed?'Registro cerrado':'Cerrar registro de grupos';
- $('close-ranking').disabled=closed||!sealed||records.length!==roster.length||loadFailed;
+ $('close-ranking').disabled=!canClose(session)||loadFailed;
+ $('show-ranking').disabled=!closed;
  $('close-ranking').textContent=closed?'Clasificación definitiva cerrada':'Cerrar clasificación definitiva';
- $('completion-summary').textContent=(closed?'Clasificación definitiva. ':'Clasificación provisional. ')+records.length+' de '+roster.length+' grupos recibidos.';
+ $('completion-summary').textContent=(closed?'Clasificación definitiva. ':'Clasificación provisional. ')+records.length+' entregados · '+pending(session)+' pendientes · '+excluded.length+' excluidos.';
  $('scan').disabled=closed||!sealed||loadFailed;$('scan-file').disabled=closed||!sealed||loadFailed;$('add-code').disabled=closed||!sealed||loadFailed;
  const {groups,institutes}=C.ranks(records);let rank=0;
  $('groups').innerHTML=groups.map((g,i)=>{
@@ -131,8 +168,48 @@ $('add-code').onclick=()=>add($('scan-text').value);
 const video=$('scan-video'),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d',{willReadFrequently:true});let stream=null,generation=0,scanning=false;
 function stop(){generation++;scanning=false;stream?.getTracks().forEach(t=>t.stop());stream=null;video.srcObject=null;video.hidden=true;$('scan').textContent='Escanear QR';}
 function decodeImage(img,w,h){const scale=Math.min(1,1200/Math.max(w,h));canvas.width=Math.max(1,Math.round(w*scale));canvas.height=Math.max(1,Math.round(h*scale));ctx.drawImage(img,0,0,canvas.width,canvas.height);const data=ctx.getImageData(0,0,canvas.width,canvas.height);return jsQR(data.data,data.width,data.height)?.data;}
-$('scan').onclick=async()=>{if(!unlocked||busy)return;if(scanning){stop();return;}scanning=true;const token=++generation;$('scan').textContent='Detener escaneo';try{const acquired=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});if(token!==generation){acquired.getTracks().forEach(t=>t.stop());return;}stream=acquired;video.srcObject=stream;video.hidden=false;await video.play();const tick=()=>{if(token!==generation)return;try{if(video.readyState>=2&&video.videoWidth){const code=decodeImage(video,video.videoWidth,video.videoHeight);if(code){stop();add(code);return;}}}catch{stop();status('No se pudo leer la cámara. Usa una fotografía.');return;}setTimeout(tick,150);};tick();}catch{if(token===generation){stop();status('No se pudo abrir la cámara. Importa una foto o el código de respaldo.');}}};
+$('scan').onclick=async()=>{
+ if(!unlocked||busy||session.closed)return;
+ if(scanning){stop();return;}
+ scanning=true;const token=++generation;$('scan').textContent='Detener escaneo';status('Cámara activa. Acerca el QR del siguiente grupo.');
+ try{
+  const acquired=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+  if(token!==generation){acquired.getTracks().forEach(t=>t.stop());return;}
+  stream=acquired;video.srcObject=stream;video.hidden=false;await video.play();
+  let lastCode='',blankFrames=0;
+  const tick=async()=>{
+   if(token!==generation||!unlocked)return;
+   try{
+    if(!busy&&video.readyState>=2&&video.videoWidth){
+     const code=decodeImage(video,video.videoWidth,video.videoHeight);
+     if(!code){if(++blankFrames>=4)lastCode='';}
+     else{blankFrames=0;if(code!==lastCode){lastCode=code;await add(code);}}
+    }
+   }catch{stop();status('No se pudo leer la cámara. Usa una fotografía.','error');return;}
+   if(token===generation)setTimeout(tick,200);
+  };
+  void tick();
+ }catch{if(token===generation){stop();status('No se pudo abrir la cámara. Importa una foto o el código de respaldo.','error');}}
+};
 $('scan-file').onchange=async e=>{const file=e.target.files[0];if(!file||!unlocked||busy)return;const token=epoch;stop();const url=URL.createObjectURL(file);try{const img=new Image();img.src=url;await img.decode();if(!unlocked||token!==epoch)return;const code=decodeImage(img,img.naturalWidth,img.naturalHeight);if(code)await add(code);else status('No se encontró un QR legible.');}catch{status('No se pudo leer la imagen.');}finally{URL.revokeObjectURL(url);e.target.value='';}};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});window.addEventListener('pagehide',stop);
-$('export').onclick=()=>{if(!unlocked||busy||!storedRaw)return;const url=URL.createObjectURL(new Blob([storedRaw],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='valentia-resultados-cifrados.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+function exportBackup(){if(!unlocked||busy||!storedRaw)return;const url=URL.createObjectURL(new Blob([storedRaw],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='valentia-resultados-cifrados.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+$('export').onclick=exportBackup;$('backup-before-close').onclick=exportBackup;
+function hidePresentation(){
+ $('ranking-presentation').hidden=true;document.body.classList.remove('presenting');
+ if(unlocked)$('teacher-private').hidden=false;
+}
+$('show-ranking').onclick=()=>{
+ if(!unlocked||busy||!session.closed)return;
+ stop();
+ const {institutes}=C.ranks(session.records),eligible=institutes.filter(x=>x.count),best=eligible[0];
+ const winners=best?eligible.filter(x=>x.sum*best.count===best.sum*x.count):[];
+ const winnerText=winners.length===2?'Empate entre institutos':winners.length===1&&eligible.length===2?'Instituto ganador':'Único instituto con resultados';
+ const groupView=$('groups').innerHTML;
+ const schoolView=eligible.map(x=>'<div class="presentation-school"><strong>'+esc(x.name)+'</strong><span>'+new Intl.NumberFormat('es-ES',{maximumFractionDigits:2}).format(x.sum/x.count/C.total*100)+' %</span></div>').join('');
+ $('presentation-content').innerHTML='<div class="presentation-hero"><p class="muted">Valentia Epigraphica · Clasificación definitiva</p><h2>'+winnerText+'</h2><p class="presentation-winner">'+winners.map(x=>esc(x.name)).join(' · ')+'</p><p>'+session.records.length+' grupos clasificados</p></div><h3>Clasificación por grupos</h3><div class="rank-list">'+groupView+'</div><h3>Clasificación por institutos</h3>'+schoolView;
+ $('teacher-private').hidden=true;$('ranking-presentation').hidden=false;document.body.classList.add('presenting');window.scrollTo(0,0);
+};
+$('exit-ranking').onclick=()=>{hidePresentation();$('presentation-content').replaceChildren();};
+$('print-ranking').onclick=()=>{if(unlocked&&session.closed&&!$('ranking-presentation').hidden)window.print();};
 showLogin();if('serviceWorker' in navigator&&isSecureContext)navigator.serviceWorker.register('./sw.js').catch(()=>status('No se pudo preparar el uso sin conexión.'));

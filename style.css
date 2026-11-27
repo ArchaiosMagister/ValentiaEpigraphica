@@ -446,3 +446,12 @@ nav button { min-width: 0; min-height: 48px; }
 .rank-place svg{width:29px;height:29px}.rank-place span{font-size:15px}.rank-main{min-width:0;overflow-wrap:anywhere}.rank-main strong{display:block;line-height:1.25}.rank-main small,.rank-score small{display:block;margin-top:4px}.rank-score{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.rank-score strong{font:700 clamp(18px,4vw,25px)/1.2 Georgia,serif;color:var(--accent)}
 .rank-meter{height:5px;background:var(--line);border-radius:9px;overflow:hidden;margin-top:8px}.rank-meter span{display:block;height:100%;background:var(--medal)}
 @media(max-width:360px){.rank-card{grid-template-columns:34px minmax(0,1fr) auto;gap:7px;padding:10px 7px}.rank-place svg{width:24px;height:24px}}
+
+.roster-tools{display:grid;gap:6px}.roster-tools input,.roster-tools select{min-height:44px;font:inherit;color:inherit;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:8px;width:100%}
+.roster-entry{grid-template-columns:minmax(0,1fr) auto}.roster-entry button{grid-column:1/-1;justify-self:start;font-size:14px}.roster-state{font-size:13px;font-weight:700}.roster-state[data-state=received]{color:var(--good)}.roster-state[data-state=absent]{color:var(--muted)}
+#teacher-status[data-kind=success]{color:var(--good);font-weight:700;background:var(--stone);padding:10px;border-radius:6px}#teacher-status[data-kind=error]{color:var(--bad);font-weight:700}
+#ranking-presentation[hidden]{display:none!important}.presentation-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}.presentation-actions button{flex:1}
+.presentation-hero{text-align:center;padding:28px 16px;background:var(--paper);border:1px solid var(--line);border-radius:10px;margin-bottom:20px}.presentation-winner{font:700 clamp(23px,5vw,34px)/1.2 Georgia,serif;color:var(--accent);overflow-wrap:anywhere}
+#presentation-content h3{margin:20px 0 10px}.presentation-school{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:12px 0}.presentation-school span{white-space:nowrap;font-weight:700}
+body.presenting{padding-bottom:20px}body.presenting #teacher-main{max-width:920px}
+@media print{body.presenting .presentation-actions,body.presenting #teacher-private,body.presenting #teacher-login{display:none!important}body.presenting .rank-card{break-inside:avoid}body:not(.presenting) #teacher-private,body:not(.presenting) #teacher-login{display:none!important}}

@@ -442,7 +442,7 @@ function competitionCard(){
  if(!activities.every(complete))return header+'<p>Completa las ocho inscripciones y la recapitulación para obtener el QR.</p></div>';
  try{
   const code=competition.encode(g,answers),result=competition.decode(code),qr=qrcode(0,'M');qr.addData(code);qr.make();
-  return header+'<p>Puntuación de clasificación (primer intento): <strong>'+result.score+'/'+competition.total+'</strong></p><div class="result-qr" id="result-qr">'+qr.createSvgTag({cellSize:4,margin:16,scalable:true})+'</div><p>Enseña este código al profesor. Puedes revisar la corrección de todas las inscripciones y de la recapitulación.</p><details><summary>Código de respaldo</summary><textarea readonly aria-label="Código de resultado">'+esc(code)+'</textarea></details></div>';
+  return header+'<p>Puntuación de clasificación (primer intento): <strong>'+result.score+'/'+competition.total+'</strong></p><div class="result-qr" id="result-qr">'+qr.createSvgTag({cellSize:4,margin:16,scalable:true})+'</div><p><strong>Entrega del resultado.</strong> Enseña el QR al profesor con el brillo de la pantalla alto y espera su confirmación. Puedes volver a esta pantalla cuando lo necesites, incluso sin conexión.</p><details><summary>Si la cámara no lee el QR</summary><p>Enseña el código de respaldo al profesor o copia el texto.</p><textarea readonly id="result-code" aria-label="Código de resultado">'+esc(code)+'</textarea><button type="button" id="copy-result" class="wide">Copiar código de resultado</button><p role="status" id="copy-status"></p></details></div>';
  }catch(e){return header+'<p role="alert">No se ha podido generar el código: '+esc(e.message)+'</p></div>';}
 }
 function renderResults(){main.innerHTML=`<h2>Resultados</h2><div class="card">${progress()}${finished()?'<p class="muted">Puntuación de las inscripciones</p><div class="score">'+score()+'/'+totalQuestions+'</div>':'<p class="muted" id="pending-correction">La puntuación y la corrección se mostrarán al completar las ocho inscripciones y la recapitulación.</p>'}<p>${count()===8?'Ocho inscripciones completadas.':'Puedes continuar en cualquier momento.'}</p></div>${recapCard()}<div class="card">${items.map(x=>`<div class="zone"><button data-open="${x.id}">${x.roman}. ${esc(x.title)}</button><strong>${finished()?points(x)+'/'+x.questions.length:complete(x)?'Entregada':'Pendiente'}</strong></div>`).join('')}</div>${competitionCard()}`}
@@ -523,6 +523,7 @@ function startGPS() {
   beginWatch(false);
 }
 document.addEventListener('click', event => {
+  if(event.target.closest('#copy-result')){const field=document.querySelector('#result-code'),message=document.querySelector('#copy-status');if(!field)return;field.focus();field.select();if(navigator.clipboard?.writeText){navigator.clipboard.writeText(field.value).then(()=>{message.textContent='Código copiado.';}).catch(()=>{message.textContent='Texto seleccionado. Usa Copiar en el menú del dispositivo.';});}else message.textContent='Texto seleccionado. Usa Copiar en el menú del dispositivo.';return;}
   const b = event.target.closest('button');
   if (!b) return;
   if (b.dataset.tab) void go(b.dataset.tab);
