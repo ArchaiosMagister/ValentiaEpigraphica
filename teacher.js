@@ -119,7 +119,12 @@ function render(){
  $('completion-summary').textContent=(closed?'Clasificación definitiva. ':'Clasificación provisional. ')+records.length+' de '+roster.length+' grupos recibidos.';
  $('scan').disabled=closed||!sealed||loadFailed;$('scan-file').disabled=closed||!sealed||loadFailed;$('add-code').disabled=closed||!sealed||loadFailed;
  const {groups,institutes}=C.ranks(records);let rank=0;
- $('groups').innerHTML=groups.map((g,i)=>{if(!i||g.score!==groups[i-1].score)rank=i+1;return '<div class="teacher-rank"><div><strong>'+rank+'. '+g.names.map(esc).join(', ')+'</strong><small>'+esc(C.schools[g.school])+'</small></div><strong>'+g.score+'/'+C.total+'</strong></div>';}).join('')||'<p>Todavía no se han recibido resultados.</p>';
+ $('groups').innerHTML=groups.map((g,i)=>{
+  if(!i||g.score!==groups[i-1].score)rank=i+1;
+  const medal=rank<=3?' medal-'+rank:'';
+  const trophy=rank<=3?'<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 3h16v3h5v4c0 5-3 8-8 9-1 2-2 3-3 4v3h6v3H8v-3h6v-3c-1-1-2-2-3-4-5-1-8-4-8-9V6h5zm0 6H6v1c0 3 1 4 4 6L8 9zm16 0-2 7c3-2 4-3 4-6V9z"/></svg>':'';
+  return '<article class="rank-card'+medal+'" data-rank="'+rank+'"><div class="rank-place" aria-label="Puesto '+rank+'">'+trophy+'<span>'+rank+'º</span></div><div class="rank-main"><strong>'+g.names.map(esc).join(', ')+'</strong><small>'+esc(C.schools[g.school])+'</small><div class="rank-meter" aria-hidden="true"><span style="width:'+100*g.score/C.total+'%"></span></div></div><div class="rank-score"><strong>'+g.score+'/'+C.total+'</strong><small>'+new Intl.NumberFormat('es-ES',{maximumFractionDigits:1}).format(100*g.score/C.total)+' %</small></div></article>';
+ }).join('')||'<p>Todavía no se han recibido resultados.</p>';
  rank=0;$('schools').innerHTML=institutes.map((s,i)=>{if(s.count&&(!i||s.sum*institutes[i-1].count!==institutes[i-1].sum*s.count))rank=i+1;return '<div class="teacher-rank"><div><strong>'+(s.count?rank+'. ':'')+esc(s.name)+'</strong><small>'+s.count+' grupos recibidos de '+roster.filter(g=>g.school===s.id).length+' · '+s.pupils+' alumnos</small></div><strong>'+(s.count?new Intl.NumberFormat('es-ES',{maximumFractionDigits:2}).format(s.sum/s.count/C.total*100)+' %':'Sin resultados')+'</strong></div>';}).join('');
 }
 $('add-code').onclick=()=>add($('scan-text').value);

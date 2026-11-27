@@ -436,3 +436,13 @@ nav button { min-width: 0; min-height: 48px; }
 .group-form input,.teacher-form select{box-sizing:border-box;width:100%;font:inherit;color:inherit;background:transparent;border:1px solid currentColor;border-radius:.5rem;padding:.6rem}.teacher-form[hidden]{display:none}#roster strong{overflow-wrap:anywhere}
 
 #teacher-private[hidden],#teacher-login[hidden],#confirm-password-wrap[hidden],#restore-wrap[hidden]{display:none!important}#teacher-login input{box-sizing:border-box;width:100%;font:inherit;color:inherit;background:transparent;border:1px solid currentColor;border-radius:.5rem;padding:.6rem}#teacher-private>#lock-area{margin-bottom:1rem}
+
+/* Clasificación: metal de los trofeos y jerarquía accesible en pantallas pequeñas. */
+.rank-list{display:grid;gap:10px}.rank-card{--medal:var(--muted);display:grid;grid-template-columns:48px minmax(0,1fr) auto;align-items:center;gap:12px;padding:13px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+.rank-card.medal-1{--medal:#936410;border-color:#c49a43;background:linear-gradient(110deg,#c49a431b,transparent 70%),var(--paper)}
+.rank-card.medal-2{--medal:#5d6874;border-color:#939da7;background:linear-gradient(110deg,#9da8b21d,transparent 70%),var(--paper)}
+.rank-card.medal-3{--medal:#98592f;border-color:#b77d54;background:linear-gradient(110deg,#b77d541a,transparent 70%),var(--paper)}
+.rank-place{display:grid;justify-items:center;gap:1px;color:var(--medal);font-weight:800;font-variant-numeric:tabular-nums}
+.rank-place svg{width:29px;height:29px}.rank-place span{font-size:15px}.rank-main{min-width:0;overflow-wrap:anywhere}.rank-main strong{display:block;line-height:1.25}.rank-main small,.rank-score small{display:block;margin-top:4px}.rank-score{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.rank-score strong{font:700 clamp(18px,4vw,25px)/1.2 Georgia,serif;color:var(--accent)}
+.rank-meter{height:5px;background:var(--line);border-radius:9px;overflow:hidden;margin-top:8px}.rank-meter span{display:block;height:100%;background:var(--medal)}
+@media(max-width:360px){.rank-card{grid-template-columns:34px minmax(0,1fr) auto;gap:7px;padding:10px 7px}.rank-place svg{width:24px;height:24px}}
