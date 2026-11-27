@@ -42,6 +42,10 @@ jobs:
       - name: Regresiones funcionales
         if: matrix.engine == 'chromium'
         run: node tests/browser.cjs
+      - name: Área docente cifrada y ciclo de vida
+        env:
+          VE_BROWSER: ${{ matrix.engine }}
+        run: node tests/teacher-vault.cjs
       - name: Casos límite de estabilidad
         env:
           VE_BROWSER: ${{ matrix.engine }}

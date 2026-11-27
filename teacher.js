@@ -41,19 +41,20 @@ function touch(){if(!unlocked)return;lastActivity=Date.now();clearTimeout(idleTi
 function done(){busy=false;if(lockPending){lockPending=false;lock();}}
 $('login-form').onsubmit=async e=>{
  e.preventDefault();if(busy||unlocked||loadFailed)return;
- busy=true;$('unlock').disabled=true;loginStatus('');
+ busy=true;const token=epoch;$('unlock').disabled=true;loginStatus('');
  const password=$('teacher-password').value, confirmation=$('confirm-password').value, file=$('restore-vault').files[0];
  $('teacher-password').value='';$('confirm-password').value='';
  try{
   const prior=storedRaw;let opened,raw=prior,next;
   if(prior!==null){opened=await VE_VAULT.open(prior,password);next=checkSession(opened.session);}
-  else if(file){if(file.size>5000000)throw Error('La copia es demasiado grande.');raw=await file.text();opened=await VE_VAULT.open(raw,password);next=checkSession(opened.session);}
+  else if(file){if(localStorage.getItem('ve-teacher-results-v2')!==null)throw Error('Hay datos anteriores: configúralos primero para cifrarlos.');if(file.size>5000000)throw Error('La copia es demasiado grande.');raw=await file.text();opened=await VE_VAULT.open(raw,password);next=checkSession(opened.session);}
   else{
    if(password!==confirmation)throw Error('Las contraseñas no coinciden.');
    const legacy=localStorage.getItem('ve-teacher-results-v2');
    next=legacy?checkSession(JSON.parse(legacy)):empty();
    opened=await VE_VAULT.create(next,password);raw=opened.raw;
   }
+  if(token!==epoch)return;
   if(localStorage.getItem(key)!==prior)throw Error('El área cambió en otra pestaña. Recarga la página.');
   if(prior===null)localStorage.setItem(key,raw);
   // The prior experimental format is removed only after its encrypted replacement is saved.
@@ -61,7 +62,7 @@ $('login-form').onsubmit=async e=>{
   storedRaw=raw;session=next;vaultKey=opened.key;salt=opened.salt;unlocked=true;epoch++;
   $('restore-vault').value='';$('teacher-login').hidden=true;$('teacher-private').hidden=false;render();touch();
  }catch(e){loginStatus(e.message);}
- finally{done();$('unlock').disabled=loadFailed;}
+ finally{done();$('unlock').disabled=loadFailed||!crypto.subtle;}
 };
 async function save(next){
  if(!unlocked||busy)return false;
@@ -78,7 +79,7 @@ async function save(next){
 $('lock-area').onclick=lock;
 for(const event of ['pointerdown','keydown','touchstart'])document.addEventListener(event,touch,{passive:true});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&unlocked&&Date.now()-lastActivity>=idleMs)lock();});
-window.addEventListener('pagehide',()=>{if(unlocked){busy=false;lock();}});
+window.addEventListener('pagehide',()=>{if(unlocked){busy=false;lock();}else{epoch++;$('teacher-password').value='';$('confirm-password').value='';}});
 $('delete-vault').onclick=()=>{
  if(!unlocked||busy)return;
  if(!confirm('¿Eliminar definitivamente el registro, los códigos y todos los resultados de este dispositivo? Las copias descargadas no se borrarán.')||!confirm('Esta acción no se puede deshacer. ¿Confirmas la eliminación?'))return;
