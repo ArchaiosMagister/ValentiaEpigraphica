@@ -2,7 +2,7 @@
 
 const scope = self.registration.scope;
 const prefix = 'valentia-epigraphica:' + scope + ':';
-const release = '1.0-rc18-grupos-qr';
+const release = '1.0-rc19-codigos-qr';
 const version = prefix + release;
 const index = new URL('index.html', scope).href;
 const assets = new Set([

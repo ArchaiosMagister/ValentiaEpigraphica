@@ -10,7 +10,7 @@ const root = path.resolve(__dirname, '..');
 const key = 'valentia-epigraphica-v1';
 const engine = process.env.VE_BROWSER || 'chromium';
 const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.webmanifest':'application/manifest+json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.woff2':'font/woff2','.ttf':'font/ttf'};
-let release = '1.0-rc18-grupos-qr';
+let release = '1.0-rc19-codigos-qr';
 let failPhoto = false;
 const server = http.createServer(async (req, res) => {
   try {
@@ -22,7 +22,7 @@ const server = http.createServer(async (req, res) => {
     const file = path.resolve(root, relative);
     if (!file.startsWith(root + path.sep)) { res.writeHead(403).end(); return; }
     let data = await fs.readFile(file);
-    if (relative === 'sw.js') data = data.toString().replace("const release = '1.0-rc18-grupos-qr';", "const release = '" + release + "';");
+    if (relative === 'sw.js') data = data.toString().replace("const release = '1.0-rc19-codigos-qr';", "const release = '" + release + "';");
     res.writeHead(200, {'Content-Type':types[path.extname(file)] || 'application/octet-stream','Cache-Control':'no-store'}).end(data);
   } catch { res.writeHead(404).end(); }
 });
@@ -32,6 +32,7 @@ async function ready(page) {
 }
 async function start(page) {
   await page.locator('#group-school').selectOption('veles');
+    await page.locator('#group-code').fill('V-123456789ABC');
   await page.locator('#group-names').fill('Manuel\nAndrea');
   await page.getByRole('button', {name:'Empezar recorrido'}).click();
   await page.locator('nav [data-tab=list]').waitFor();
@@ -122,14 +123,14 @@ async function read(page) { return page.evaluate(key => JSON.parse(localStorage.
     await a.evaluate(() => window.dispatchEvent(new Event('online')));
     await ready(a);
     // Update with a waiting worker, retaining the progress across activation.
-    release = '1.0-rc18-grupos-qr-fixture-update';
+    release = '1.0-rc19-codigos-qr-fixture-update';
     await a.evaluate(async () => (await navigator.serviceWorker.getRegistration()).update());
     await wait(a, async () => !!(await navigator.serviceWorker.getRegistration()).waiting);
     await b.close(); await a.close();
     const next = await context.newPage();
     await next.goto(base); await ready(next);
     await wait(next, async () => (await caches.keys()).some(k => k.endsWith('fixture-update')) &&
-      !(await caches.keys()).some(k => k.endsWith('1.0-rc18-grupos-qr')));
+      !(await caches.keys()).some(k => k.endsWith('1.0-rc19-codigos-qr')));
     await next.locator('nav [data-tab=results]').click();
     await wait(next, () => document.querySelector('.score')?.textContent === '4/26');
     await context.close();
@@ -151,14 +152,14 @@ async function read(page) { return page.evaluate(key => JSON.parse(localStorage.
     await c.getByText(/No se puede garantizar el guardado/).waitFor();
     await start(c); await grade(c,1);
     assert.equal((await read(c)).answers[1].graded.length,4);
-    await c.evaluate(key => localStorage.setItem(key,JSON.stringify({group:{id:crypto.randomUUID(),school:'veles',names:['Manuel','Andrea']},started:true,theme:'invalid',answers:{1:{draft:[99,null,-2],graded:[99,null,-2]}}})),key);
+    await c.evaluate(key => localStorage.setItem(key,JSON.stringify({group:{id:crypto.randomUUID(),school:'veles',code:'V-123456789ABC',names:['Manuel','Andrea']},started:true,theme:'invalid',answers:{1:{draft:[99,null,-2],graded:[99,null,-2]}}})),key);
     await c.reload();
     assert.equal(await c.locator('html').getAttribute('data-theme'),'light');
     await c.locator('nav [data-tab=results]').click();
     await wait(c, () => document.querySelector('.score')?.textContent === '0/26');
     // Legacy index-only answers for IV.1 must never be silently regraded
     // as the new whole-syntagm question. Retain its other two answers.
-    await c.evaluate(key => localStorage.setItem(key,JSON.stringify({group:{id:crypto.randomUUID(),school:'veles',names:['Manuel','Andrea']},started:true,theme:'light',answers:{4:{draft:[1,0,2],graded:[1,0,2]}}})),key);
+    await c.evaluate(key => localStorage.setItem(key,JSON.stringify({group:{id:crypto.randomUUID(),school:'veles',code:'V-123456789ABC',names:['Manuel','Andrea']},started:true,theme:'light',answers:{4:{draft:[1,0,2],graded:[1,0,2]}}})),key);
     await c.reload();
     await c.locator('nav [data-tab=results]').click();
     await wait(c, () => document.querySelector('.score')?.textContent === '2/26');

@@ -15,6 +15,7 @@ require('../data.js');
     await page.getByText('Disponible sin conexión', { exact: true }).waitFor();
     assert.equal(await page.locator('.inscription-types[open] dt').count(), 3);
     await page.locator('#group-school').selectOption('veles');
+    await page.locator('#group-code').fill('V-123456789ABC');
     await page.locator('#group-names').fill('Manuel\nAndrea\nJuan');
     await page.getByRole('button', { name: 'Empezar recorrido' }).click();
     await page.locator('#gps').click();
@@ -122,15 +123,29 @@ require('../data.js');
     assert.match(await page.locator('#result-qr').locator('..').textContent(),/31\/31/);
     const qrImage=await page.locator('#result-qr').screenshot();
     await page.goto(base+'teacher.html');
+    // Use a pre-registered fixture matching the student code, plus an actual generated group to verify generation.
+    await page.locator('#roster-school').selectOption('om');
+    await page.locator('#roster-names').fill('Clara\nMarc');
+    await page.getByRole('button',{name:'Generar código'}).click();
+    await page.getByText(/Código generado: O-[A-F0-9]{12}/).waitFor();
+    await page.evaluate(()=>localStorage.setItem('ve-teacher-results-v2',JSON.stringify({roster:[{id:crypto.randomUUID(),school:'veles',code:'V-123456789ABC',names:['Manuel','Andrea','Juan']}],records:[],sealed:false,closed:false})));
+    await page.reload();
+    page.once('dialog',d=>d.accept());
+    await page.locator('#seal-roster').click();
     await page.locator('#scan-file').setInputFiles({name:'result.png',mimeType:'image/png',buffer:qrImage});
     await page.getByText('Resultado recibido:',{exact:false}).waitFor();
     assert.match(await page.locator('#groups').textContent(),/31\/31/);
     await page.locator('#scan-file').setInputFiles({name:'result.png',mimeType:'image/png',buffer:qrImage});
-    await page.getByText('Este grupo ya está registrado.',{exact:false}).waitFor();
+    await page.getByText('Este grupo ya ha entregado su resultado.',{exact:false}).waitFor();
+    page.once('dialog',d=>d.accept());
+    await page.locator('#close-ranking').click();
+    assert.ok(await page.locator('#scan').isDisabled());
+    await page.reload();
+    assert.ok(await page.locator('#close-ranking').isDisabled());
     await page.goto(base);
     await page.evaluate(() => localStorage.setItem('valentia-epigraphica-v1', JSON.stringify({
       answers: { 1: { draft: [1, 0], graded: [1, 0] } },
-      theme: 'light', started:true, group:{id:crypto.randomUUID(),school:'veles',names:['Manuel','Andrea']},
+      theme: 'light', started:true, group:{id:crypto.randomUUID(),school:'veles',code:'V-123456789ABC',names:['Manuel','Andrea']},
     })));
     await page.reload();
     await page.locator('nav [data-tab=results]').click();
