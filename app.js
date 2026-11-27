@@ -346,7 +346,7 @@ function attachQuiz(x) {
       const question = x.questions[i];
       const correct = gradedAnswers?.[i] === question.correct;
       message.hidden = !gradedAnswers;
-      message.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
+      message.className = gradedAnswers ? 'feedback ' + (correct ? 'correct' : 'incorrect') : 'feedback';
       message.innerHTML = gradedAnswers
         ? (correct ? 'Correcto. ' : 'Respuesta incorrecta. ') + formatLatinTerms(question.explanation)
         : '';
@@ -378,7 +378,7 @@ function attachQuiz(x) {
     // when a different tab is also committing progress. Never overwrite
     // an in-flight local choice with a previous persisted snapshot.
     for (const [i, value] of values.entries()) {
-      if (value === renderedDraft[i] || value === visible[i] || visible[i] !== renderedDraft[i]) continue;
+      if (value === visible[i] || (!complete(x) && (value === renderedDraft[i] || visible[i] !== renderedDraft[i]))) continue;
       const inputs = form.querySelectorAll('input[name=q' + i + ']');
       if (value === null) inputs.forEach(input => { input.checked = false; });
       else {
