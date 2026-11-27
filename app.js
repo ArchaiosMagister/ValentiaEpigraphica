@@ -546,6 +546,22 @@ document.addEventListener('visibilitychange', () => {
 render();
 storageStatus();
 
+// The guide never navigates, saves or resets student progress.
+const guide=document.querySelector('#student-guide'),guideButton=document.querySelector('#how-it-works');
+guideButton.addEventListener('click',()=>{
+ const stage=!state.group?'register':finished()?'delivery':count()===8?'recap':tab==='detail'?'questions':'route';
+ const messages={register:'Ahora: registrad vuestro grupo.',route:'Ahora: seguid el itinerario y completad las inscripciones pendientes.',questions:'Ahora: revisad vuestras respuestas y enviad la ficha cuando esté completa.',recap:'Ahora: completad la recapitulación final.',delivery:'Ahora: mostrad el QR al profesor y esperad su confirmación.'};
+ document.querySelector('#guide-current').textContent=messages[stage];
+ for(const step of guide.querySelectorAll('[data-stage]')){
+  if(step.dataset.stage===stage)step.setAttribute('aria-current','step');else step.removeAttribute('aria-current');
+ }
+ guide.showModal();guide.querySelector('.guide-content').scrollTop=0;
+});
+document.querySelector('#close-guide').addEventListener('click',()=>guide.close());
+document.querySelector('#guide-done').addEventListener('click',()=>guide.close());
+guide.addEventListener('close',()=>guideButton.focus({preventScroll:true}));
+
+
 const offlineStatus = document.querySelector('#offline-status');
 let offlineCheck = 0;
 let installTimer;

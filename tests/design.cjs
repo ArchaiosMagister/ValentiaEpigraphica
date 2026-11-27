@@ -19,7 +19,7 @@ async function layout(page, label) {
     const result = await page.evaluate(() => ({
       viewport: innerWidth,
       root: document.documentElement.scrollWidth,
-      controls: [...document.querySelectorAll('nav:not([hidden]) button, #theme')].map(e => {
+      controls: [...document.querySelectorAll('nav:not([hidden]) button, #theme, #how-it-works')].map(e => {
         const r = e.getBoundingClientRect();
         return { width: r.width, height: r.height, left: r.left, right: r.right };
       }),
@@ -65,6 +65,15 @@ async function theme(page, value) {
       await theme(page, value);
       await layout(page, 'welcome ' + value);
       assert.ok(await page.locator('.welcome-wordmark').isVisible());
+      await page.locator('#how-it-works').click();
+      assert.equal(await page.locator('#student-guide').isVisible(),true);
+      assert.equal(await page.locator('[data-stage=register]').getAttribute('aria-current'),'step');
+      for(const width of widths){
+        await page.setViewportSize({width,height:650});
+        assert.ok(await page.locator('#student-guide').evaluate(e=>e.getBoundingClientRect().width<=innerWidth&&e.getBoundingClientRect().height<=innerHeight));
+      }
+      await page.locator('#close-guide').click();
+      assert.equal(await page.locator('#student-guide').isVisible(),false);
     }
     await page.locator('#group-school').selectOption('veles');
     await page.locator('#group-code').fill('V-123456789ABC');
