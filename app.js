@@ -3,6 +3,7 @@ const { items, recap } = VE_DATA;
 const activities = [...items, recap];
 const main = document.querySelector('#main');
 const key = 'valentia-epigraphica-v1';
+const competition = VE_COMP;
 const themes = ['light', 'dark', 'oled'];
 const defaultTheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 let storageOK = true;
@@ -16,7 +17,7 @@ function normalizeAnswers(raw) {
     // A text snapshot prevents an old index from silently selecting a
     // different option if the question bank is reordered or edited.
     const snapshot = Array.isArray(entry.questions) ? entry.questions : null;
-    for (const field of ['draft', 'graded']) {
+    for (const field of ['draft', 'graded', 'first']) {
       if (!Array.isArray(entry[field])) continue;
       record[field] = x.questions.map((q, i) => {
         // The original Asclepius question (IV.1) was replaced. Legacy
@@ -45,6 +46,7 @@ function normalizedState(raw) {
   const answers = normalizeAnswers(raw.answers);
   return {
     answers,
+    group: competition.group(raw.group),
     theme: themes.includes(raw.theme) ? raw.theme : defaultTheme,
     started: raw.started === true || Object.keys(answers).length > 0,
     generation: typeof raw.generation === 'string' ? raw.generation : 'legacy',
@@ -63,7 +65,7 @@ function readState() {
 
 let state = readState() || normalizedState({});
 let { answers, theme, started } = state;
-let tab = started ? 'route' : 'welcome';
+let tab = state.group && started ? 'route' : 'welcome';
 let selected = null, position = null, watch = null, gpsGeneration = 0;
 let gpsMessage = 'Activa la ubicación para ver la distancia aproximada.';
 let syncDetail = null, pendingWrites = 0, writeQueue = Promise.resolve();
@@ -96,6 +98,8 @@ function adopt(next) {
     selected = null;
   } else if (tab === 'recap' && !recapUnlocked()) {
     tab = 'results';
+  } else if (!next.group) {
+    tab = 'welcome'; selected = null;
   } else if (started && tab === 'welcome') {
     tab = 'route';
   }
@@ -239,12 +243,23 @@ function renderWelcome() {
       <h2>Ocho inscripciones romanas</h2>
       <p>Recorre el centro de Valencia, lee cada inscripción en su lugar y responde tres o cuatro preguntas breves. Al terminar las ocho fichas, podrás realizar una recapitulación final.</p>
       <div class="welcome-facts"><div><strong aria-hidden="true">VIII</strong><span>8 inscripciones</span></div><div><strong aria-hidden="true">IV</strong><span>4 localizaciones</span></div></div>
-      <button class="primary wide" data-go="route">Empezar recorrido</button>
+      <form id="group-form" class="group-form">
+<h3>Registro del grupo</h3><label for="group-school">Instituto</label><select id="group-school" required><option value="">Selecciona tu instituto</option>${Object.entries(competition.schools).map(([id,name])=>`<option value="${id}">${esc(name)}</option>`).join('')}</select>
+<label for="group-names">Nombres de los miembros (uno por línea, de 2 a 6)</label><textarea id="group-names" rows="4" required placeholder="Manuel&#10;Andrea&#10;Juan" maxlength="260"></textarea><p class="muted">Solo nombres de pila. Se guardarán en este dispositivo y en el del profesor al entregar el resultado. Se puntúan las primeras respuestas comprobadas.</p>
+${Object.keys(answers).length ? '<p class="note">El progreso anterior al registro no cuenta para la clasificación. Al comenzar se sustituirá por una actividad nueva.</p>' : ''}
+<p id="group-error" role="alert"></p><button class="primary wide" type="submit">Empezar recorrido</button></form>
       ${inscriptionTypes(true)}
     </div>
   </section>`;
+  main.querySelector('#group-form').addEventListener('submit',event=>{
+    event.preventDefault();
+    const names=main.querySelector('#group-names').value.split(/\r?\n/).filter(n=>n.trim());
+    const g=competition.group({id:crypto.randomUUID(),names,school:main.querySelector('#group-school').value});
+    if(!g){main.querySelector('#group-error').textContent='Selecciona un instituto y escribe de dos a seis nombres válidos (máximo 40 caracteres).';return;}
+    main.querySelector('#group-form button').disabled=true;
+    void persist('start',next=>{if(next.group)return;next.group=g;next.answers={};next.started=true;});
+  });
 }
-
 function renderRoute() {
   const next = items.find(x => !complete(x));
   main.innerHTML = `<h2>Itinerario</h2>
@@ -391,6 +406,7 @@ function attachQuiz(x) {
       const record = answerRecord(next, x);
       record.draft = values.slice();
       record.graded = values.slice();
+      if (!record.first?.every(Number.isInteger)) record.first = values.slice();
       next.started = true;
     });
   });
@@ -404,13 +420,20 @@ function recapCard() {
       <button class="primary wide" data-go="recap">${complete(recap) ? 'Revisar recapitulación' : 'Hacer recapitulación'}</button>`
       : '<p class="muted">Se desbloquea al completar las ocho inscripciones.</p>'}</div>`;
 }
-function renderResults(){main.innerHTML=`<h2>Resultados</h2><div class="card">${progress()}<p class="muted">Puntuación (últimas respuestas comprobadas)</p><div class="score">${score()}/${totalQuestions}</div><p>${count()===8?'Ocho inscripciones completadas.':'Puedes continuar en cualquier momento.'}</p></div>${recapCard()}<div class="card">${items.map(x=>`<div class="zone"><button data-open="${x.id}">${x.roman}. ${esc(x.title)}</button><strong>${answers[x.id]?.graded?.some(Number.isInteger)?points(x)+'/'+x.questions.length:'—'}</strong></div>`).join('')}</div><div class="card"><h3>Reiniciar la actividad</h3><p class="muted">Borra las respuestas de este dispositivo para repetir la actividad.</p><button class="wide" id="reset">Reiniciar actividad</button></div>`}
+function competitionCard(){
+ const g=state.group;if(!g)return '';
+ const header='<div class="card"><h3>Resultado del grupo</h3><p><strong>'+g.names.map(esc).join(', ')+'</strong><br>'+esc(competition.schools[g.school])+'</p>';
+ if(!activities.every(complete))return header+'<p>Completa las ocho inscripciones y la recapitulación para obtener el QR.</p></div>';
+ try{
+  const code=competition.encode(g,answers),result=competition.decode(code),qr=qrcode(0,'M');qr.addData(code);qr.make();
+  return header+'<p>Puntuación de clasificación (primer intento): <strong>'+result.score+'/'+competition.total+'</strong></p><div class="result-qr" id="result-qr">'+qr.createSvgTag({cellSize:4,margin:16,scalable:true})+'</div><p>Enseña este código al profesor. Las correcciones posteriores no cambian la clasificación.</p><details><summary>Código de respaldo</summary><textarea readonly aria-label="Código de resultado">'+esc(code)+'</textarea></details></div>';
+ }catch(e){return header+'<p role="alert">No se ha podido generar el código: '+esc(e.message)+'</p></div>';}
+}
+function renderResults(){main.innerHTML=`<h2>Resultados</h2><div class="card">${progress()}<p class="muted">Puntuación (últimas respuestas comprobadas)</p><div class="score">${score()}/${totalQuestions}</div><p>${count()===8?'Ocho inscripciones completadas.':'Puedes continuar en cualquier momento.'}</p></div>${recapCard()}<div class="card">${items.map(x=>`<div class="zone"><button data-open="${x.id}">${x.roman}. ${esc(x.title)}</button><strong>${answers[x.id]?.graded?.some(Number.isInteger)?points(x)+'/'+x.questions.length:'—'}</strong></div>`).join('')}</div>${competitionCard()}`}
 function render(){syncDetail=null;document.querySelector("nav").hidden=tab==="welcome";document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.tab===(tab==='detail'?'list':tab==='recap'?'results':tab)?'page':'false'));({welcome:renderWelcome,route:renderRoute,list:renderList,detail:renderDetail,recap:renderRecap,results:renderResults}[tab])();if(!storageOK)document.querySelector('#storage-status').textContent='No se pudo acceder al progreso guardado en este dispositivo.'}
 async function go(t, id) {
   if (t === 'recap' && !recapUnlocked()) return;
-  if (tab === 'welcome' && t !== 'welcome') {
-    if (await persist('start', next => { next.started = true; })) return;
-  }
+  if (!state.group && t !== 'welcome') return;
   if (t !== 'route' && t !== 'detail' && watch !== null) stopGPS();
   tab = t;
   selected = id || null;
@@ -490,13 +513,7 @@ document.addEventListener('click', event => {
   else if (b.dataset.go) void go(b.dataset.go);
   else if (b.dataset.open) void go('detail', Number(b.dataset.open));
   else if (b.id === 'gps') startGPS();
-  else if (b.id === 'reset' && confirm('¿Borrar todas las respuestas de esta actividad?')) {
-    void persist('reset', next => {
-      next.answers = {};
-      next.started = false;
-      next.generation = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
-    });
-  } else if (b.id === 'theme') {
+  else if (b.id === 'theme') {
     void persist('theme', next => {
       next.theme = themes[(themes.indexOf(next.theme) + 1) % themes.length];
     });

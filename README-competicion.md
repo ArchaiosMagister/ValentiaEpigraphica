@@ -1,0 +1,4 @@
+# Jornada única
+Alumnado: registrar el centro y los nombres de pila (2–6), completar ocho inscripciones y recapitulación y enseñar el QR de Resultados. No hay reinicio ni modo libre.
+Profesor: abrir teacher.html bajo la misma URL de Pages (preparar con conexión), escanear cada grupo, o importar foto/código. Guardar copia JSON local. Clasificación provisional hasta recoger todos los grupos. La media por centro no depende del número de grupos. Empates comparten puesto. Los primeros intentos se conservan y las correcciones posteriores no alteran la clasificación.
+No se transmiten datos a servicios externos. Las bibliotecas QR se incluyen localmente con sus licencias. El resultado se recalcula a partir de respuestas, pero una aplicación cliente no puede impedir toda manipulación. Custodiar los datos y borrar copias al finalizar su uso.

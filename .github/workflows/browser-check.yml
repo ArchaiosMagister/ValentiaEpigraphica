@@ -37,6 +37,8 @@ jobs:
           done
           cat /tmp/ve-server.log
           exit 1
+      - name: Protocolo de clasificación
+        run: node tests/competition.cjs
       - name: Regresiones funcionales
         if: matrix.engine == 'chromium'
         run: node tests/browser.cjs

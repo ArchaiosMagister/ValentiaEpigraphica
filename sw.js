@@ -2,11 +2,12 @@
 
 const scope = self.registration.scope;
 const prefix = 'valentia-epigraphica:' + scope + ':';
-const release = '1.0-rc17-recap-final';
+const release = '1.0-rc18-grupos-qr';
 const version = prefix + release;
 const index = new URL('index.html', scope).href;
 const assets = new Set([
   'index.html', 'style.css', 'data.js', 'map.js', 'app.js',
+  'competition.js', 'teacher.html', 'teacher.js', 'vendor/qrcode.js', 'vendor/jsQR.js',
   'manifest.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png',
   'fonts/cinzel-600.woff2',
   'fonts/marcellus-regular.ttf', 'fonts/source-serif-4-regular.woff2',

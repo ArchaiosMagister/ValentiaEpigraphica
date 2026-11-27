@@ -14,6 +14,8 @@ require('../data.js');
     await page.goto(base);
     await page.getByText('Disponible sin conexión', { exact: true }).waitFor();
     assert.equal(await page.locator('.inscription-types[open] dt').count(), 3);
+    await page.locator('#group-school').selectOption('veles');
+    await page.locator('#group-names').fill('Manuel\nAndrea\nJuan');
     await page.getByRole('button', { name: 'Empezar recorrido' }).click();
     await page.locator('#gps').click();
     await page.getByText('Permiso denegado.', { exact: false }).waitFor();
@@ -115,21 +117,20 @@ require('../data.js');
     await page.getByRole('button',{name:'Revisar recapitulación'}).click();
     assert.equal(await page.locator('input:checked').count(),5);
     await page.locator('nav [data-tab=results]').click();
-    page.once('dialog', dialog => dialog.dismiss());
-    await page.locator('#reset').click();
-    assert.equal(await page.locator('.score').textContent(), '25/26');
-    page.once('dialog', dialog => dialog.accept());
-    await page.locator('#reset').click();
-    await page.getByRole('button', { name: 'Empezar recorrido' }).waitFor();
-    await page.reload();
-    await page.getByRole('button', { name: 'Empezar recorrido' }).click();
-    await page.locator('nav [data-tab=results]').click();
-    assert.equal(await page.locator('.score').textContent(), '0/26');
-    assert.equal(await page.locator('[data-go=recap]').count(),0);
-    assert.equal(await page.locator('#recap-score').count(),0);
+    assert.equal(await page.locator('#reset').count(),0);
+    assert.ok(await page.locator('#result-qr svg').isVisible());
+    assert.match(await page.locator('#result-qr').locator('..').textContent(),/31\/31/);
+    const qrImage=await page.locator('#result-qr').screenshot();
+    await page.goto(base+'teacher.html');
+    await page.locator('#scan-file').setInputFiles({name:'result.png',mimeType:'image/png',buffer:qrImage});
+    await page.getByText('Resultado recibido:',{exact:false}).waitFor();
+    assert.match(await page.locator('#groups').textContent(),/31\/31/);
+    await page.locator('#scan-file').setInputFiles({name:'result.png',mimeType:'image/png',buffer:qrImage});
+    await page.getByText('Este grupo ya está registrado.',{exact:false}).waitFor();
+    await page.goto(base);
     await page.evaluate(() => localStorage.setItem('valentia-epigraphica-v1', JSON.stringify({
       answers: { 1: { draft: [1, 0], graded: [1, 0] } },
-      theme: 'light',
+      theme: 'light', started:true, group:{id:crypto.randomUUID(),school:'veles',names:['Manuel','Andrea']},
     })));
     await page.reload();
     await page.locator('nav [data-tab=results]').click();
