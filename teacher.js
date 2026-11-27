@@ -39,7 +39,7 @@ function lock(){
  if(!unlocked)return;
  if(busy){lockPending=true;return;}
  epoch++;unlocked=false;vaultKey=null;salt=null;session=empty();clearTimeout(idleTimer);idleTimer=null;
- stop();hidePresentation();$('presentation-content').replaceChildren();$('roster-count').textContent='';$('roster-search').value='';$('roster-filter').value='all';$('roster').replaceChildren();$('groups').replaceChildren();$('schools').replaceChildren();
+ stop();hidePresentation();$('presentation-content').replaceChildren();$('roster-count').textContent='';$('collection-count').textContent='';$('roster-search').value='';$('roster-filter').value='all';$('roster').replaceChildren();$('groups').replaceChildren();$('schools').replaceChildren();
  for(const id of ['roster-status','teacher-status','completion-summary'])$(id).textContent='';
  for(const id of ['roster-names','scan-text','scan-file'])$(id).value='';
  $('roster-school').selectedIndex=0;
@@ -147,6 +147,10 @@ $('roster-search').oninput=renderRoster;$('roster-filter').onchange=renderRoster
 function render(){
  const {roster,records,excluded,sealed,closed}=session;
  renderRoster();
+ const collection=$('collection'),panel=$('roster-panel');
+ if(sealed&&!closed&&panel.nextElementSibling===collection)panel.before(collection);
+ else if((!sealed||closed)&&collection.nextElementSibling===panel)panel.after(collection);
+ $('collection-count').textContent=records.length+' entregados · '+pending(session)+' pendientes · '+excluded.length+' excluidos';
  $('roster-form').hidden=sealed;
  $('seal-roster').disabled=sealed||!roster.length||loadFailed;
  $('seal-roster').textContent=sealed?'Registro cerrado':'Cerrar registro de grupos';
@@ -194,7 +198,7 @@ $('scan').onclick=async()=>{
 $('scan-file').onchange=async e=>{const file=e.target.files[0];if(!file||!unlocked||busy)return;const token=epoch;stop();const url=URL.createObjectURL(file);try{const img=new Image();img.src=url;await img.decode();if(!unlocked||token!==epoch)return;const code=decodeImage(img,img.naturalWidth,img.naturalHeight);if(code)await add(code);else status('No se encontró un QR legible.');}catch{status('No se pudo leer la imagen.');}finally{URL.revokeObjectURL(url);e.target.value='';}};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});window.addEventListener('pagehide',stop);
 function exportBackup(){if(!unlocked||busy||!storedRaw)return;const url=URL.createObjectURL(new Blob([storedRaw],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='valentia-resultados-cifrados.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-$('export').onclick=exportBackup;$('backup-before-close').onclick=exportBackup;
+$('export').onclick=exportBackup;
 function hidePresentation(){
  $('ranking-presentation').hidden=true;document.body.classList.remove('presenting');
  if(unlocked)$('teacher-private').hidden=false;
